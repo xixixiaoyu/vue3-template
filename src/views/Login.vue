@@ -3,10 +3,10 @@
 defineOptions({
   name: 'LoginPage',
 })
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useFormValidation, validationRules } from '@/composables'
+import { useFormValidation, validationRules, useSeo, useAutoAnimate } from '@/composables'
 import { z } from 'zod'
 import { LogIn, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-vue-next'
 import {
@@ -62,6 +62,17 @@ const goToRegister = () => {
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value
 }
+
+// 设置 SEO 元数据
+useSeo({
+  title: '登录 - Vue 3 Supabase 模板',
+  description: '登录您的账户以访问我们的服务',
+  keywords: '登录,认证,Vue 3,Supabase',
+  robots: 'noindex,nofollow',
+})
+
+// 设置动画
+const [parent] = useAutoAnimate()
 </script>
 
 <template>
@@ -108,7 +119,7 @@ const togglePasswordVisibility = () => {
             </div>
           </div>
 
-          <form class="space-y-5" @submit.prevent="handleSubmit">
+          <form ref="parent" class="space-y-5" @submit.prevent="handleSubmit">
             <!-- 邮箱输入 -->
             <div class="space-y-2">
               <Label for="email" class="text-sm font-medium text-foreground">邮箱地址</Label>

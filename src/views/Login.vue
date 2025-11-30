@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useFormValidation, validationRules } from '@/composables'
+import { z } from 'zod'
 import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-vue-next'
 import {
   Button,
@@ -17,46 +19,36 @@ import {
 const router = useRouter()
 const authStore = useAuthStore()
 
-// 表单数据
-const formData = reactive({
-  email: '',
-  password: '',
+// 定义表单验证 schema
+const loginSchema = z.object({
+  email: validationRules.email,
+  password: validationRules.password,
 })
 
-// 表单状态
-const showPassword = ref(false)
-const isSubmitting = ref(false)
-
-// 错误处理
-const formError = ref('')
-
-// 处理登录
-const handleLogin = async () => {
-  if (!formData.email || !formData.password) {
-    formError.value = '请填写所有必填字段'
-    return
-  }
-
-  isSubmitting.value = true
-  formError.value = ''
-
-  try {
-    const result = await authStore.signIn(formData.email, formData.password)
+// 使用表单验证
+const {
+  values: formData,
+  fields,
+  isSubmitting,
+  serverError,
+  handleSubmit,
+} = useFormValidation({
+  schema: loginSchema,
+  onSubmit: async (values) => {
+    const result = await authStore.signIn(values.email, values.password)
 
     if (result.success) {
       // 登录成功，重定向到仪表板
       router.push({ name: 'dashboard' })
     } else {
-      // 登录失败，显示错误信息
-      formError.value = result.error || '登录失败，请重试'
+      // 登录失败，抛出错误让 composable 处理
+      throw new Error(result.error || '登录失败，请重试')
     }
-  } catch (error) {
-    formError.value = '登录过程中发生错误，请重试'
-    console.error('登录错误:', error)
-  } finally {
-    isSubmitting.value = false
-  }
-}
+  },
+})
+
+// 表单状态
+const showPassword = ref(false)
 
 // 切换到注册页面
 const goToRegister = () => {
@@ -83,11 +75,11 @@ const goToRegister = () => {
       </CardHeader>
 
       <CardContent>
-        <form class="space-y-4" @submit.prevent="handleLogin">
+        <form class="space-y-4" @submit.prevent="handleSubmit">
           <!-- 错误提示 -->
-          <div v-if="formError || authStore.error" class="rounded-md bg-destructive/15 p-4">
+          <div v-if="serverError || authStore.error" class="rounded-md bg-destructive/15 p-4">
             <div class="text-sm text-destructive">
-              {{ formError || authStore.error }}
+              {{ serverError || authStore.error }}
             </div>
           </div>
 
@@ -100,13 +92,18 @@ const goToRegister = () => {
               </div>
               <Input
                 id="email"
-                v-model="formData.email"
+                :value="fields.email.value"
+                @input="fields.email.value = $event.target.value"
+                @blur="fields.email.validate"
                 type="email"
                 autocomplete="email"
                 required
-                class="pl-10"
+                :class="`pl-10 ${fields.email.errorMessage ? 'border-destructive' : ''}`"
                 placeholder="your@email.com"
               />
+              <div v-if="fields.email.errorMessage" class="text-sm text-destructive mt-1">
+                {{ fields.email.errorMessage }}
+              </div>
             </div>
           </div>
 
@@ -119,11 +116,13 @@ const goToRegister = () => {
               </div>
               <Input
                 id="password"
-                v-model="formData.password"
+                :value="fields.password.value"
+                @input="fields.password.value = $event.target.value"
+                @blur="fields.password.validate"
                 :type="showPassword ? 'text' : 'password'"
                 autocomplete="current-password"
                 required
-                class="pl-10 pr-10"
+                :class="`pl-10 pr-10 ${fields.password.errorMessage ? 'border-destructive' : ''}`"
                 placeholder="••••••••"
               />
               <Button
@@ -136,6 +135,9 @@ const goToRegister = () => {
                 <Eye v-if="!showPassword" class="h-4 w-4 text-muted-foreground" />
                 <EyeOff v-else class="h-4 w-4 text-muted-foreground" />
               </Button>
+              <div v-if="fields.password.errorMessage" class="text-sm text-destructive mt-1">
+                {{ fields.password.errorMessage }}
+              </div>
             </div>
           </div>
 

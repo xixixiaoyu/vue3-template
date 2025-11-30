@@ -11,6 +11,7 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@radix-icons/vue": "^1.0.0",
     "@supabase/supabase-js": "^2.38.4",
     "@vee-validate/zod": "^4.15.1",
     "lucide-vue-next": "^0.294.0",

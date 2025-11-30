@@ -18,7 +18,7 @@ const labelClass = computed(() => {
 </script>
 
 <template>
-  <label :class="labelClass" :for="for" v-bind="$attrs">
+  <label :class="labelClass" :for="props.for" v-bind="$attrs">
     <slot />
   </label>
 </template>

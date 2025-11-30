@@ -32,11 +32,6 @@ const handleSignOut = async () => {
     console.error('退出登录失败:', result.error)
   }
 }
-
-// 跳转到登录页
-const goToLogin = () => {
-  router.push({ name: 'login' })
-}
 </script>
 
 <template>

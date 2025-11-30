@@ -1,4 +1,4 @@
-import { ref, reactive, readonly } from 'vue'
+import { ref, readonly } from 'vue'
 import type { Notification } from '@/types'
 
 const notifications = ref<Notification[]>([])

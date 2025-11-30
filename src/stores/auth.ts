@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
 import { supabase } from '@/lib/supabase'
-import type { User, Session } from '@supabase/supabase-js'
+import type { User as SupabaseUser, Session } from '@supabase/supabase-js'
+import type { User } from '@/types'
 
 export const useAuthStore = defineStore(
   'auth',
   () => {
     // 状态
-    const user = ref<User | null>(null)
+    const user = ref<SupabaseUser | null>(null)
     const session = ref<Session | null>(null)
     const loading = ref(false)
     const error = ref<string | null>(null)

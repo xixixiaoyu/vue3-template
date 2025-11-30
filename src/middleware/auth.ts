@@ -1,12 +1,12 @@
 import { useAuthStore } from '@/stores/auth'
 
 // 认证中间件
-export function authMiddleware(to: any, from: any, next: any) {
+export async function authMiddleware(to: any, from: any, next: any) {
   const authStore = useAuthStore()
 
   // 如果用户状态尚未初始化，先初始化
   if (!authStore.user && !authStore.loading) {
-    authStore.initialize()
+    await authStore.initialize()
   }
 
   // 检查是否需要认证

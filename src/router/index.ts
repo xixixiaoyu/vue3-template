@@ -42,12 +42,12 @@ router.beforeEach(async (to, from, next) => {
   // 检查是否需要认证
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     // 需要认证但用户未登录，重定向到登录页
-    next({ name: 'login', query: { redirect: to.fullPath } })
+    return next({ name: 'login', query: { redirect: to.fullPath } })
   }
   // 检查是否需要游客状态（已登录用户不应访问登录/注册页）
   else if (to.meta.requiresGuest && authStore.isAuthenticated) {
     // 需要游客状态但用户已登录，重定向到仪表板
-    next({ name: 'dashboard' })
+    return next({ name: 'dashboard' })
   } else {
     // 允许访问
     next()

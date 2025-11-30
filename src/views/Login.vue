@@ -131,8 +131,7 @@ const [, setParent] = useAutoAnimate()
                 </div>
                 <Input
                   id="email"
-                  :value="fields.email.value"
-                  @input="fields.email.value = $event.target.value"
+                  v-model="fields.email.value"
                   @blur="fields.email.validate"
                   type="email"
                   autocomplete="email"

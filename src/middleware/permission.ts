@@ -1,8 +1,13 @@
 import { useAuthStore } from '@/stores/auth'
+import type { RouteLocationNormalized } from 'vue-router'
 
 // 权限中间件
 export function permissionMiddleware(requiredPermissions: string[] = []) {
-  return (to: any, from: any, next: (arg?: any) => void) => {
+  return (
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized,
+    next: (arg?: any) => void
+  ) => {
     const authStore = useAuthStore()
 
     // 如果用户未登录，重定向到登录页
@@ -19,7 +24,7 @@ export function permissionMiddleware(requiredPermissions: string[] = []) {
     }
 
     // 获取用户权限（这里需要根据实际的用户权限结构进行调整）
-    const userPermissions = authStore.user?.user_metadata?.permissions || []
+    const userPermissions = (authStore.user?.user_metadata?.permissions as string[]) || []
 
     // 检查用户是否具有所需权限
     const hasPermission = requiredPermissions.some((permission) =>
@@ -41,7 +46,11 @@ export function permissionMiddleware(requiredPermissions: string[] = []) {
 
 // 角色中间件
 export function roleMiddleware(requiredRoles: string[] = []) {
-  return (to: any, from: any, next: (arg?: any) => void) => {
+  return (
+    to: RouteLocationNormalized,
+    from: RouteLocationNormalized,
+    next: (arg?: any) => void
+  ) => {
     const authStore = useAuthStore()
 
     // 如果用户未登录，重定向到登录页
@@ -58,10 +67,10 @@ export function roleMiddleware(requiredRoles: string[] = []) {
     }
 
     // 获取用户角色（这里需要根据实际的用户角色结构进行调整）
-    const userRole = authStore.user?.user_metadata?.role
+    const userRole = authStore.user?.user_metadata?.role as string
 
     // 检查用户是否具有所需角色
-    const hasRole = requiredRoles.includes(userRole)
+    const hasRole = userRole ? requiredRoles.includes(userRole) : false
 
     if (!hasRole) {
       // 用户没有所需角色，重定向到无权限页面或仪表板

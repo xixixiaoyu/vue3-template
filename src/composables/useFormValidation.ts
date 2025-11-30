@@ -30,11 +30,12 @@ export function useFormValidation<T extends z.ZodObject<any>>(
   const fieldNames = Object.keys(options.schema.shape)
 
   fieldNames.forEach((fieldName) => {
-    const { value, errorMessage, meta } = useField(fieldName)
+    const { value, errorMessage, meta, validate } = useField(fieldName)
     fields[fieldName] = {
       value,
       errorMessage,
       meta,
+      validate,
       name: fieldName,
     }
   })

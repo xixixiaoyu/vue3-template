@@ -101,7 +101,7 @@ export function usePagination(options: UsePaginationOptions = {}) {
       // 总页数较多，智能显示页码
       const half = Math.floor(maxVisiblePages / 2)
       let start = Math.max(1, page.value - half)
-      let end = Math.min(totalPages.value, start + maxVisiblePages - 1)
+      const end = Math.min(totalPages.value, start + maxVisiblePages - 1)
 
       // 调整起始位置，确保显示足够的页码
       if (end - start + 1 < maxVisiblePages) {

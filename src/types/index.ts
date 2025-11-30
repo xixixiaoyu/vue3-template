@@ -13,9 +13,10 @@ export interface User {
   name?: string
   avatar?: string
   created_at: string
-  updated_at: string
+  updated_at?: string
   last_sign_in_at?: string
   user_metadata?: Record<string, any>
+  app_metadata?: Record<string, any>
 }
 
 // 表单相关类型

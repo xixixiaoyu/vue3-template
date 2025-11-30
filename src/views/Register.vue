@@ -6,7 +6,7 @@ defineOptions({
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useFormValidation, validationRules } from '@/composables'
+import { useFormValidation, validationRules, useAutoAnimate } from '@/composables'
 import { z } from 'zod'
 import { UserPlus, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-vue-next'
 import {
@@ -74,6 +74,9 @@ const togglePasswordVisibility = () => {
 const toggleConfirmPasswordVisibility = () => {
   showConfirmPassword.value = !showConfirmPassword.value
 }
+
+// 设置动画
+const [, setParent] = useAutoAnimate()
 </script>
 
 <template>
@@ -120,7 +123,7 @@ const toggleConfirmPasswordVisibility = () => {
             </div>
           </div>
 
-          <form class="space-y-5" @submit.prevent="handleSubmit">
+          <form ref="setParent" class="space-y-5" @submit.prevent="handleSubmit">
             <!-- 邮箱输入 -->
             <div class="space-y-2">
               <Label for="email" class="text-sm font-medium text-foreground">邮箱地址</Label>

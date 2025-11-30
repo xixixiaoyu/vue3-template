@@ -2,7 +2,7 @@ import { useAuthStore } from '@/stores/auth'
 
 // 权限中间件
 export function permissionMiddleware(requiredPermissions: string[] = []) {
-  return (to: any, from: any, next: any) => {
+  return (to: any, from: any, next: (arg?: any) => void) => {
     const authStore = useAuthStore()
 
     // 如果用户未登录，重定向到登录页
@@ -41,7 +41,7 @@ export function permissionMiddleware(requiredPermissions: string[] = []) {
 
 // 角色中间件
 export function roleMiddleware(requiredRoles: string[] = []) {
-  return (to: any, from: any, next: any) => {
+  return (to: any, from: any, next: (arg?: any) => void) => {
     const authStore = useAuthStore()
 
     // 如果用户未登录，重定向到登录页

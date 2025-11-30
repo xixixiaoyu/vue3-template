@@ -141,6 +141,10 @@ export const useAuthStore = defineStore(
       key: 'auth-store',
       storage: localStorage,
       pick: ['session', 'user'], // 只持久化 session 和 user 状态
+      serializer: {
+        serialize: JSON.stringify,
+        deserialize: JSON.parse,
+      },
     },
   }
 )

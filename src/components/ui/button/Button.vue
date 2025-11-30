@@ -29,7 +29,12 @@ const buttonVariants = cva(
   }
 )
 
-interface ButtonProps extends /* @vue-ignore */ VariantProps<typeof buttonVariants> {
+// 添加组件名称以符合多词组件命名规则
+defineOptions({
+  name: 'UiButton',
+})
+
+interface ButtonProps extends VariantProps<typeof buttonVariants> {
   as?: string
   class?: string
   disabled?: boolean

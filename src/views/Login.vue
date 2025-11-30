@@ -3,7 +3,7 @@
 defineOptions({
   name: 'LoginPage',
 })
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFormValidation, validationRules, useSeo, useAutoAnimate } from '@/composables'
@@ -72,7 +72,7 @@ useSeo({
 })
 
 // 设置动画
-const [parent] = useAutoAnimate()
+const [, setParent] = useAutoAnimate()
 </script>
 
 <template>
@@ -119,7 +119,7 @@ const [parent] = useAutoAnimate()
             </div>
           </div>
 
-          <form ref="parent" class="space-y-5" @submit.prevent="handleSubmit">
+          <form ref="setParent" class="space-y-5" @submit.prevent="handleSubmit">
             <!-- 邮箱输入 -->
             <div class="space-y-2">
               <Label for="email" class="text-sm font-medium text-foreground">邮箱地址</Label>

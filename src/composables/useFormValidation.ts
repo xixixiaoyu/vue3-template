@@ -39,7 +39,7 @@ export function useFormValidation<T extends z.ZodObject<any>>(
     }
   })
 
-  const handleSubmit = form.handleSubmit(async (values) => {
+  const handleSubmit = form.handleSubmit(async (values: z.infer<T>) => {
     try {
       isSubmitting.value = true
       serverError.value = ''

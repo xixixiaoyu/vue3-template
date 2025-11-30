@@ -64,9 +64,8 @@ export class ApiService<T = any> {
 
   // 获取单个记录
   async getById(id: string): Promise<ApiResponse<T>> {
-    // 使用类型断言来绕过 TypeScript 的严格检查
-    const { data, error } = await (supabase as any)
-      .from(this.tableName)
+    const { data, error } = await supabase
+      .from(this.tableName as any)
       .select('*')
       .eq('id', id)
       .single()
@@ -92,7 +91,7 @@ export class ApiService<T = any> {
       filters = {},
     } = options
 
-    let query = (supabase as any).from(this.tableName).select('*', { count: 'exact' })
+    let query = supabase.from(this.tableName as any).select('*', { count: 'exact' })
 
     // 应用过滤条件
     Object.entries(filters).forEach(([key, value]) => {
@@ -159,14 +158,20 @@ export class ApiService<T = any> {
 
   // 删除记录
   async delete(id: string): Promise<ApiResponse<void>> {
-    const { error } = await (supabase as any).from(this.tableName).delete().eq('id', id)
+    const { error } = await supabase
+      .from(this.tableName as any)
+      .delete()
+      .eq('id', id)
 
     return handleVoidResponse(error)
   }
 
   // 批量删除
   async deleteMany(ids: string[]): Promise<ApiResponse<void>> {
-    const { error } = await (supabase as any).from(this.tableName).delete().in('id', ids)
+    const { error } = await supabase
+      .from(this.tableName as any)
+      .delete()
+      .in('id', ids)
 
     return handleVoidResponse(error)
   }
@@ -181,8 +186,8 @@ export class ApiService<T = any> {
     }
 
     try {
-      const { data, error } = await (supabase as any)
-        .from(this.tableName)
+      const { data, error } = await supabase
+        .from(this.tableName as any)
         .select('*')
         .ilike(searchColumn, `%${searchTerm.trim()}%`)
 

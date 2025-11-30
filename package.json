@@ -20,6 +20,12 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:codegen": "playwright codegen",
     "test:e2e:install": "playwright install",
+    "db:init": "node scripts/init-database.js",
+    "db:migrate": "supabase db push",
+    "db:reset": "supabase db reset",
+    "db:types": "supabase gen types typescript --local > src/types/database.types.ts",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
     "prepare": "husky"
   },
   "lint-staged": {

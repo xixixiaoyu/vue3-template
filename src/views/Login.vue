@@ -19,6 +19,7 @@ import {
   Input,
   Label,
 } from '@/components/ui'
+import OAuthButtons from '@/components/auth/OAuthButtons.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -108,6 +109,8 @@ const [, setParent] = useAutoAnimate()
         </CardHeader>
 
         <CardContent class="space-y-6">
+          <!-- OAuth 登录 -->
+          <OAuthButtons :redirect-path="($route.query.redirect as string) || '/'" />
           <!-- 错误提示 -->
           <div
             v-if="hasError"

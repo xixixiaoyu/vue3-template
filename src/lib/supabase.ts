@@ -22,4 +22,18 @@ if (!import.meta.env.DEV && (!url || !key)) {
   )
 }
 
-export const supabase = createClient<Database>(url, key)
+// 添加额外的客户端配置选项
+const options = {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
+    },
+  },
+}
+
+export const supabase = createClient<Database>(url, key, options)

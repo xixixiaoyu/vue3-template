@@ -2,6 +2,10 @@
 import type { DropdownMenuRootEmits, DropdownMenuRootProps } from 'reka-ui'
 import { DropdownMenuRoot, useForwardPropsEmits } from 'reka-ui'
 
+defineOptions({
+  name: 'UiDropdownMenu',
+})
+
 const props = defineProps<DropdownMenuRootProps>()
 const emits = defineEmits<DropdownMenuRootEmits>()
 

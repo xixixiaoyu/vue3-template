@@ -1,7 +1,12 @@
 import { useAuthStore } from '@/stores/auth'
+import type { RouteLocationNormalized } from 'vue-router'
 
 // 认证中间件
-export async function authMiddleware(to: any, from: any, next: any) {
+export async function authMiddleware(
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: (arg?: any) => void
+) {
   const authStore = useAuthStore()
 
   // 如果用户状态尚未初始化，先初始化

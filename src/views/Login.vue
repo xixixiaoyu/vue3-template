@@ -172,8 +172,7 @@ const [, setParent] = useAutoAnimate()
                 </div>
                 <Input
                   id="password"
-                  :value="fields.password.value"
-                  @input="fields.password.value = $event.target.value"
+                  v-model="fields.password.value"
                   @blur="fields.password.validate"
                   :type="showPassword ? 'text' : 'password'"
                   autocomplete="current-password"

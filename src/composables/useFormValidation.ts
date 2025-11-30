@@ -31,13 +31,13 @@ export function useFormValidation<T extends z.ZodObject<any>>(
 
   fieldNames.forEach((fieldName) => {
     const { value, errorMessage, meta, validate } = useField(fieldName)
-    fields[fieldName] = {
+    fields[fieldName] = reactive({
       value,
       errorMessage,
       meta,
       validate,
       name: fieldName,
-    }
+    })
   })
 
   const handleSubmit = form.handleSubmit(async (values: z.infer<T>) => {

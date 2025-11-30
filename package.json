@@ -13,16 +13,16 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "prepare": "husky",
-    "lint-staged": {
-      "*.{js,jsx,ts,tsx,vue}": [
-        "eslint --fix",
-        "prettier --write"
-      ],
-      "*.{json,md,yml,yaml}": [
-        "prettier --write"
-      ]
-    }
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@radix-icons/vue": "^1.0.0",

@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+// 定义组件名称
+defineOptions({
+  name: 'LoginPage',
+})
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFormValidation, validationRules } from '@/composables'
 import { z } from 'zod'
-import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-vue-next'
+import { LogIn, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-vue-next'
 import {
   Button,
   Card,
@@ -26,13 +30,7 @@ const loginSchema = z.object({
 })
 
 // 使用表单验证
-const {
-  values: formData,
-  fields,
-  isSubmitting,
-  serverError,
-  handleSubmit,
-} = useFormValidation({
+const { fields, isSubmitting, serverError, handleSubmit } = useFormValidation({
   schema: loginSchema,
   onSubmit: async (values) => {
     const result = await authStore.signIn(values.email, values.password)
@@ -50,126 +48,212 @@ const {
 // 表单状态
 const showPassword = ref(false)
 
+// 计算属性
+const isLoading = computed(() => isSubmitting.value || authStore.loading)
+const hasError = computed(() => !!(serverError.value || authStore.error))
+const errorMessage = computed(() => serverError.value || authStore.error || '')
+
 // 切换到注册页面
 const goToRegister = () => {
   router.push({ name: 'register' })
+}
+
+// 切换密码显示状态
+const togglePasswordVisibility = () => {
+  showPassword.value = !showPassword.value
 }
 </script>
 
 <template>
   <div
-    class="min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8"
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4"
   >
-    <Card class="w-full max-w-md">
-      <CardHeader class="text-center">
-        <div class="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-primary/10">
-          <LogIn class="h-6 w-6 text-primary" />
+    <div class="w-full max-w-md">
+      <!-- 品牌标识区域 -->
+      <div class="text-center mb-8">
+        <div
+          class="mx-auto h-16 w-16 flex items-center justify-center rounded-2xl bg-primary shadow-lg shadow-primary/25 mb-6 transition-all duration-300 hover:scale-105"
+        >
+          <LogIn class="h-8 w-8 text-primary-foreground" />
         </div>
-        <CardTitle class="mt-6">登录您的账户</CardTitle>
-        <CardDescription>
-          或者
-          <Button variant="link" @click="goToRegister" class="p-0 h-auto font-normal">
-            创建新账户
-          </Button>
-        </CardDescription>
-      </CardHeader>
+        <h1 class="text-4xl font-bold text-foreground mb-3 tracking-tight">欢迎回来</h1>
+        <p class="text-muted-foreground text-lg leading-relaxed">登录您的账户以继续使用</p>
+      </div>
 
-      <CardContent>
-        <form class="space-y-4" @submit.prevent="handleSubmit">
+      <!-- 登录卡片 -->
+      <Card class="shadow-xl border-0 backdrop-blur-sm bg-card/95">
+        <CardHeader class="space-y-2 pb-6">
+          <CardTitle class="text-2xl font-semibold text-center">登录</CardTitle>
+          <CardDescription class="text-center text-base leading-relaxed">
+            还没有账户？
+            <Button
+              variant="link"
+              @click="goToRegister"
+              class="p-0 h-auto font-normal text-primary hover:text-primary/80 transition-colors"
+            >
+              立即注册
+            </Button>
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent class="space-y-6">
           <!-- 错误提示 -->
-          <div v-if="serverError || authStore.error" class="rounded-md bg-destructive/15 p-4">
-            <div class="text-sm text-destructive">
-              {{ serverError || authStore.error }}
+          <div
+            v-if="hasError"
+            class="flex items-start gap-3 p-4 rounded-lg bg-destructive/10 border border-destructive/20 animate-in slide-in-from-top-2 duration-200"
+          >
+            <AlertCircle class="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
+            <div class="text-sm text-destructive break-words">
+              {{ errorMessage }}
             </div>
           </div>
 
-          <!-- 邮箱输入 -->
-          <div class="space-y-2">
-            <Label for="email">邮箱地址</Label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail class="h-4 w-4 text-muted-foreground" />
+          <form class="space-y-5" @submit.prevent="handleSubmit">
+            <!-- 邮箱输入 -->
+            <div class="space-y-2">
+              <Label for="email" class="text-sm font-medium text-foreground">邮箱地址</Label>
+              <div class="relative group">
+                <div class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <Mail
+                    class="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"
+                  />
+                </div>
+                <Input
+                  id="email"
+                  :value="fields.email.value"
+                  @input="fields.email.value = $event.target.value"
+                  @blur="fields.email.validate"
+                  type="email"
+                  autocomplete="email"
+                  required
+                  :class="`pl-12 h-12 text-base transition-all duration-200 ${
+                    fields.email.errorMessage
+                      ? 'border-destructive focus:border-destructive focus:ring-destructive/20'
+                      : 'focus:border-primary focus:ring-primary/20'
+                  }`"
+                  placeholder="your@email.com"
+                />
               </div>
-              <Input
-                id="email"
-                :value="fields.email.value"
-                @input="fields.email.value = $event.target.value"
-                @blur="fields.email.validate"
-                type="email"
-                autocomplete="email"
-                required
-                :class="`pl-10 ${fields.email.errorMessage ? 'border-destructive' : ''}`"
-                placeholder="your@email.com"
-              />
-              <div v-if="fields.email.errorMessage" class="text-sm text-destructive mt-1">
+              <div
+                v-if="fields.email.errorMessage"
+                class="flex items-center gap-1.5 text-sm text-destructive mt-1.5 min-h-[1.25rem] animate-in slide-in-from-left-2 duration-200"
+              >
+                <AlertCircle class="h-4 w-4 flex-shrink-0" />
                 {{ fields.email.errorMessage }}
               </div>
             </div>
-          </div>
 
-          <!-- 密码输入 -->
-          <div class="space-y-2">
-            <Label for="password">密码</Label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock class="h-4 w-4 text-muted-foreground" />
+            <!-- 密码输入 -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <Label for="password" class="text-sm font-medium text-foreground">密码</Label>
+                <Button
+                  variant="link"
+                  class="p-0 h-auto text-sm text-primary hover:text-primary/80 transition-colors"
+                >
+                  忘记密码？
+                </Button>
               </div>
-              <Input
-                id="password"
-                :value="fields.password.value"
-                @input="fields.password.value = $event.target.value"
-                @blur="fields.password.validate"
-                :type="showPassword ? 'text' : 'password'"
-                autocomplete="current-password"
-                required
-                :class="`pl-10 pr-10 ${fields.password.errorMessage ? 'border-destructive' : ''}`"
-                placeholder="••••••••"
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                class="absolute inset-y-0 right-0 h-full px-3 py-2 hover:bg-transparent"
-                @click="showPassword = !showPassword"
+              <div class="relative group">
+                <div class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <Lock
+                    class="h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors"
+                  />
+                </div>
+                <Input
+                  id="password"
+                  :value="fields.password.value"
+                  @input="fields.password.value = $event.target.value"
+                  @blur="fields.password.validate"
+                  :type="showPassword ? 'text' : 'password'"
+                  autocomplete="current-password"
+                  required
+                  :class="`pl-12 pr-12 h-12 text-base transition-all duration-200 ${
+                    fields.password.errorMessage
+                      ? 'border-destructive focus:border-destructive focus:ring-destructive/20'
+                      : 'focus:border-primary focus:ring-primary/20'
+                  }`"
+                  placeholder="••••••••"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  class="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 hover:bg-muted/50 transition-all duration-200 hover:scale-105"
+                  @click="togglePasswordVisibility"
+                  :disabled="isLoading"
+                >
+                  <Eye
+                    v-if="!showPassword"
+                    class="h-5 w-5 text-foreground/70 hover:text-foreground transition-colors"
+                  />
+                  <EyeOff
+                    v-else
+                    class="h-5 w-5 text-foreground/70 hover:text-foreground transition-colors"
+                  />
+                </Button>
+              </div>
+              <div
+                v-if="fields.password.errorMessage"
+                class="flex items-center gap-1.5 text-sm text-destructive mt-1.5 min-h-[1.25rem] animate-in slide-in-from-left-2 duration-200"
               >
-                <Eye v-if="!showPassword" class="h-4 w-4 text-muted-foreground" />
-                <EyeOff v-else class="h-4 w-4 text-muted-foreground" />
-              </Button>
-              <div v-if="fields.password.errorMessage" class="text-sm text-destructive mt-1">
+                <AlertCircle class="h-4 w-4 flex-shrink-0" />
                 {{ fields.password.errorMessage }}
               </div>
             </div>
-          </div>
 
-          <!-- 提交按钮 -->
-          <Button type="submit" :disabled="isSubmitting || authStore.loading" class="w-full">
-            <span v-if="isSubmitting || authStore.loading" class="flex items-center">
-              <svg
-                class="animate-spin -ml-1 mr-2 h-4 w-4"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
+            <!-- 记住我和提交按钮 -->
+            <div class="space-y-4">
+              <div class="flex items-center space-x-3">
+                <input
+                  id="remember"
+                  type="checkbox"
+                  class="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/20 focus:ring-2"
+                />
+                <Label for="remember" class="text-sm text-foreground cursor-pointer select-none">
+                  记住我
+                </Label>
+              </div>
+
+              <Button
+                type="submit"
+                :disabled="isLoading"
+                class="w-full h-12 text-base font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-200 hover:scale-[1.02]"
               >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              登录中...
-            </span>
-            <span v-else>登录</span>
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+                <span v-if="isLoading" class="flex items-center gap-2">
+                  <svg
+                    class="animate-spin h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  登录中...
+                </span>
+                <span v-else>登录</span>
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      <!-- 底部信息 -->
+      <div class="text-center mt-6 text-sm text-muted-foreground/80 leading-relaxed">
+        <p>登录即表示您同意我们的服务条款和隐私政策</p>
+      </div>
+    </div>
   </div>
 </template>

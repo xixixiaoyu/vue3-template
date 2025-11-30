@@ -6,7 +6,7 @@ import { useNotification } from './useNotification'
 
 interface UseFormValidationOptions<T extends z.ZodObject<any>> {
   schema: T
-  initialValues?: Record<string, any>
+  initialValues?: z.infer<T>
   onSubmit: (values: z.infer<T>) => Promise<void> | void
 }
 
@@ -17,14 +17,25 @@ export function useFormValidation<T extends z.ZodObject<any>>(
 
   const form = useForm({
     validationSchema: toTypedSchema(options.schema),
-    initialValues: options.initialValues || {},
+    initialValues: options.initialValues || ({} as z.infer<T>),
   })
 
   const isSubmitting = ref(false)
   const serverError = ref<string>('')
 
   // 为每个字段创建 useField
-  const fields = reactive<Record<string, any>>({})
+  const fields = reactive<
+    Record<
+      string,
+      {
+        value: any
+        errorMessage: string | undefined
+        meta: any
+        validate: () => Promise<any>
+        name: string
+      }
+    >
+  >({})
 
   // 获取 schema 中的所有字段名
   const fieldNames = Object.keys(options.schema.shape)
@@ -64,7 +75,7 @@ export function useFormValidation<T extends z.ZodObject<any>>(
   }
 
   const setFieldValue = (fieldName: string, value: any) => {
-    form.setValues({ [fieldName]: value })
+    form.setFieldValue(fieldName, value)
   }
 
   const setErrors = (errors: Record<string, string>) => {
@@ -79,7 +90,7 @@ export function useFormValidation<T extends z.ZodObject<any>>(
 
   return {
     // 表单状态
-    values: form.values,
+    values: form.values as z.infer<T>,
     errors: form.errors,
     meta: form.meta,
 
@@ -105,11 +116,20 @@ export const validationRules = {
   required: (message = '此字段为必填项') => z.string().min(1, message),
   email: z.string().email('请输入有效的邮箱地址'),
   password: z.string().min(6, '密码至少需要 6 个字符'),
-  confirmPassword: (passwordField = 'password') =>
+  confirmPassword: (passwordField = 'password', getValues?: () => any) =>
     z
       .string()
       .min(1, '请确认密码')
-      .refine((data) => data === passwordField, { message: '两次输入的密码不一致' }),
+      .refine(
+        (data) => {
+          if (getValues) {
+            const password = getValues()[passwordField]
+            return data === password
+          }
+          return false // 如果没有提供 getValues 函数，默认返回 false
+        },
+        { message: '两次输入的密码不一致' }
+      ),
   phone: z.string().regex(/^1[3-9]\d{9}$/, '请输入有效的手机号码'),
   url: z.string().url('请输入有效的 URL'),
   number: (min?: number, max?: number) => {

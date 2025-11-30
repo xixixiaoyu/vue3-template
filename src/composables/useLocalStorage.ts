@@ -1,5 +1,5 @@
 import { ref, watch, type Ref } from 'vue'
-import { storage } from '@/utils'
+import { storage } from '@/utils/index'
 
 export function useLocalStorage<T>(
   key: string,

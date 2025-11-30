@@ -2,7 +2,6 @@ import { defineStore } from 'pinia'
 import { ref, computed, readonly } from 'vue'
 import { supabase } from '@/lib/supabase'
 import type { User as SupabaseUser, Session } from '@supabase/supabase-js'
-import type { User } from '@/types'
 
 export const useAuthStore = defineStore(
   'auth',
@@ -144,7 +143,22 @@ export const useAuthStore = defineStore(
       pick: ['session', 'user'], // 只持久化 session 和 user 状态
       serializer: {
         serialize: JSON.stringify,
-        deserialize: JSON.parse,
+        deserialize: (value: string) => {
+          try {
+            const parsed = JSON.parse(value)
+            // 确保恢复的数据类型正确
+            return {
+              session: parsed.session || null,
+              user: parsed.user || null,
+            }
+          } catch (error) {
+            console.error('反序列化认证数据失败:', error)
+            return {
+              session: null,
+              user: null,
+            }
+          }
+        },
       },
     },
   }

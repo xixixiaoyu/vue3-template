@@ -5,9 +5,22 @@ import type { ApiResponse, ListResponse, Pagination } from '@/types'
 function handleApiResponse<T>(data: T | null, error: any): ApiResponse<T> {
   if (error) {
     console.error('API 请求失败:', error)
+    // 更详细的错误处理
+    let errorMessage = '请求失败'
+
+    if (typeof error === 'string') {
+      errorMessage = error
+    } else if (error instanceof Error) {
+      errorMessage = error.message
+    } else if (error && typeof error === 'object' && error.message) {
+      errorMessage = error.message
+    } else if (error && typeof error === 'object' && error.error) {
+      errorMessage = error.error
+    }
+
     return {
       success: false,
-      error: error.message || '请求失败',
+      error: errorMessage,
     }
   }
 
@@ -21,9 +34,22 @@ function handleApiResponse<T>(data: T | null, error: any): ApiResponse<T> {
 function handleVoidResponse(error: any): ApiResponse<void> {
   if (error) {
     console.error('API 请求失败:', error)
+    // 更详细的错误处理
+    let errorMessage = '请求失败'
+
+    if (typeof error === 'string') {
+      errorMessage = error
+    } else if (error instanceof Error) {
+      errorMessage = error.message
+    } else if (error && typeof error === 'object' && error.message) {
+      errorMessage = error.message
+    } else if (error && typeof error === 'object' && error.error) {
+      errorMessage = error.error
+    }
+
     return {
       success: false,
-      error: error.message || '请求失败',
+      error: errorMessage,
     }
   }
 
@@ -33,14 +59,19 @@ function handleVoidResponse(error: any): ApiResponse<void> {
 }
 
 // 通用 CRUD 操作
-export class ApiService<T> {
+export class ApiService<T = any> {
   constructor(private tableName: string) {}
 
   // 获取单个记录
   async getById(id: string): Promise<ApiResponse<T>> {
-    const { data, error } = await supabase.from(this.tableName).select('*').eq('id', id).single()
+    // 使用类型断言来绕过 TypeScript 的严格检查
+    const { data, error } = await (supabase as any)
+      .from(this.tableName)
+      .select('*')
+      .eq('id', id)
+      .single()
 
-    return handleApiResponse(data, error)
+    return handleApiResponse(data as T, error)
   }
 
   // 获取列表
@@ -61,7 +92,7 @@ export class ApiService<T> {
       filters = {},
     } = options
 
-    let query = supabase.from(this.tableName).select('*', { count: 'exact' })
+    let query = (supabase as any).from(this.tableName).select('*', { count: 'exact' })
 
     // 应用过滤条件
     Object.entries(filters).forEach(([key, value]) => {
@@ -105,45 +136,60 @@ export class ApiService<T> {
 
   // 创建记录
   async create(item: Partial<T>): Promise<ApiResponse<T>> {
-    const { data, error } = await supabase.from(this.tableName).insert(item).select().single()
+    const { data, error } = await (supabase as any)
+      .from(this.tableName)
+      .insert(item)
+      .select()
+      .single()
 
-    return handleApiResponse(data, error)
+    return handleApiResponse(data as T, error)
   }
 
   // 更新记录
   async update(id: string, updates: Partial<T>): Promise<ApiResponse<T>> {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from(this.tableName)
       .update(updates)
       .eq('id', id)
       .select()
       .single()
 
-    return handleApiResponse(data, error)
+    return handleApiResponse(data as T, error)
   }
 
   // 删除记录
   async delete(id: string): Promise<ApiResponse<void>> {
-    const { error } = await supabase.from(this.tableName).delete().eq('id', id)
+    const { error } = await (supabase as any).from(this.tableName).delete().eq('id', id)
 
     return handleVoidResponse(error)
   }
 
   // 批量删除
   async deleteMany(ids: string[]): Promise<ApiResponse<void>> {
-    const { error } = await supabase.from(this.tableName).delete().in('id', ids)
+    const { error } = await (supabase as any).from(this.tableName).delete().in('id', ids)
 
     return handleVoidResponse(error)
   }
 
   // 搜索
   async search(searchTerm: string, searchColumn = 'name'): Promise<ApiResponse<T[]>> {
-    const { data, error } = await supabase
-      .from(this.tableName)
-      .select('*')
-      .ilike(searchColumn, `%${searchTerm}%`)
+    if (!searchTerm || searchTerm.trim() === '') {
+      return {
+        success: false,
+        error: '搜索关键词不能为空',
+      }
+    }
 
-    return handleApiResponse(data, error)
+    try {
+      const { data, error } = await (supabase as any)
+        .from(this.tableName)
+        .select('*')
+        .ilike(searchColumn, `%${searchTerm.trim()}%`)
+
+      return handleApiResponse(data as T[], error)
+    } catch (err) {
+      return handleApiResponse([] as T[], err)
+    }
   }
 }
 

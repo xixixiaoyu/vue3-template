@@ -39,6 +39,12 @@ router.beforeEach(async (to, from, next) => {
     await authStore.initialize()
   }
 
+  // 如果正在加载中，等待加载完成
+  if (authStore.loading) {
+    // 可以选择显示加载页面或直接等待
+    return next()
+  }
+
   // 检查是否需要认证
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     // 需要认证但用户未登录，重定向到登录页

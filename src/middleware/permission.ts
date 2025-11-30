@@ -1,12 +1,12 @@
 import { useAuthStore } from '@/stores/auth'
-import type { RouteLocationNormalized } from 'vue-router'
+import type { RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
 
 // 权限中间件
 export function permissionMiddleware(requiredPermissions: string[] = []) {
   return (
     to: RouteLocationNormalized,
     from: RouteLocationNormalized,
-    next: (arg?: any) => void
+    next: NavigationGuardNext
   ) => {
     const authStore = useAuthStore()
 
@@ -49,7 +49,7 @@ export function roleMiddleware(requiredRoles: string[] = []) {
   return (
     to: RouteLocationNormalized,
     from: RouteLocationNormalized,
-    next: (arg?: any) => void
+    next: NavigationGuardNext
   ) => {
     const authStore = useAuthStore()
 

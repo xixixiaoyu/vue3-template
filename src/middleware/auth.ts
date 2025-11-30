@@ -1,11 +1,11 @@
 import { useAuthStore } from '@/stores/auth'
-import type { RouteLocationNormalized } from 'vue-router'
+import type { RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
 
 // 认证中间件
 export async function authMiddleware(
   to: RouteLocationNormalized,
   from: RouteLocationNormalized,
-  next: (arg?: any) => void
+  next: NavigationGuardNext
 ) {
   const authStore = useAuthStore()
 

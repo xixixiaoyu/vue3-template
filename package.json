@@ -40,7 +40,6 @@
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.9.0",
-    "@radix-icons/vue": "^1.0.0",
     "@sentry/vue": "^10.27.0",
     "@supabase/supabase-js": "^2.38.4",
     "@tanstack/vue-virtual": "^3.13.12",

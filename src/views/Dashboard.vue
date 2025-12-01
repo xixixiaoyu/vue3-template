@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { User, LogOut, Home, Settings, FileText } from 'lucide-vue-next'
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui'
+import { SampleCharts } from '@/components/ui'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -135,6 +136,12 @@ const handleSignOut = async () => {
                 </dl>
               </CardContent>
             </Card>
+
+            <!-- 图表展示 -->
+            <div class="mt-8">
+              <h3 class="text-lg font-medium text-foreground mb-4">数据图表</h3>
+              <SampleCharts />
+            </div>
 
             <!-- 快速操作 -->
             <div

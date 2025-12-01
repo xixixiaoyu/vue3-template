@@ -42,6 +42,7 @@
     "@formkit/auto-animate": "^0.9.0",
     "@sentry/vue": "^10.27.0",
     "@supabase/supabase-js": "^2.38.4",
+    "@tanstack/vue-query": "^5.92.0",
     "@tanstack/vue-virtual": "^3.13.12",
     "@unhead/vue": "^2.0.19",
     "@vee-validate/zod": "^4.15.1",
@@ -57,6 +58,7 @@
     "vue": "^3.3.9",
     "vue-i18n": "^9.14.5",
     "vue-router": "^4.2.5",
+    "vue-upload-component": "^2.8.23",
     "vuedraggable": "^4.1.0",
     "zod": "^4.1.13"
   },

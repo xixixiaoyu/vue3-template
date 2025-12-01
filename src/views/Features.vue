@@ -152,6 +152,27 @@
           </CardContent>
         </Card>
 
+        <!-- Vue Query 数据管理 -->
+        <Card>
+          <CardHeader>
+            <CardTitle class="flex items-center gap-2">
+              <Database class="h-5 w-5" />
+              Vue Query 数据管理
+            </CardTitle>
+            <CardDescription> 强大的数据获取和缓存 </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div class="space-y-4">
+              <p class="text-sm text-muted-foreground">
+                集成 Vue Query，提供自动缓存、后台重新获取、请求去重、乐观更新等功能。
+              </p>
+              <Button @click="goToUploadExample" variant="outline" class="w-full">
+                查看使用示例
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
         <!-- 错误监控 -->
         <Card>
           <CardHeader>
@@ -182,7 +203,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Globe, Loader, Image, Smartphone, List, Move, Shield } from 'lucide-vue-next'
+import { Globe, Loader, Image, Smartphone, List, Move, Shield, Database } from 'lucide-vue-next'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { LanguageSwitcher } from '@/components/ui/language-switcher'
@@ -192,6 +213,7 @@ import { DraggableList } from '@/components/ui/draggable-list'
 import { PWAInstall } from '@/components/ui/pwa-install'
 import { useLocale } from '@/composables/useI18n'
 import { reportError } from '@/lib/sentry'
+import { useRouter } from 'vue-router'
 
 // 定义组件名称
 defineOptions({
@@ -199,6 +221,7 @@ defineOptions({
 })
 
 const { t } = useLocale()
+const router = useRouter()
 
 // 虚拟列表数据
 const virtualItems = ref(
@@ -234,6 +257,11 @@ const checkPWAInstall = () => {
 // 检查在线状态
 const checkOnlineStatus = () => {
   console.log('Online status:', navigator.onLine ? 'Online' : 'Offline')
+}
+
+// 跳转到上传示例页面
+const goToUploadExample = () => {
+  router.push({ name: 'upload-example' })
 }
 
 // 模拟错误

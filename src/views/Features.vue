@@ -191,7 +191,6 @@ import { VirtualList } from '@/components/ui/virtual-list'
 import { DraggableList } from '@/components/ui/draggable-list'
 import { PWAInstall } from '@/components/ui/pwa-install'
 import { useLocale } from '@/composables/useI18n'
-import { useNProgress } from '@/composables/useNProgress'
 import { reportError } from '@/lib/sentry'
 
 // 定义组件名称
@@ -200,7 +199,6 @@ defineOptions({
 })
 
 const { t } = useLocale()
-const { start, done } = useNProgress()
 
 // 虚拟列表数据
 const virtualItems = ref(
@@ -221,10 +219,7 @@ const draggableItems = ref([
 
 // 模拟进度条
 const simulateProgress = () => {
-  start()
-  setTimeout(() => {
-    done()
-  }, 1000)
+  console.log('进度条功能已移除')
 }
 
 // 检查 PWA 安装

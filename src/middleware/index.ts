@@ -1,3 +1,1 @@
-// 导出所有中间件
-export * from './auth'
-export * from './permission'
+// 中间件功能已整合到路由守卫中，此文件保留用于未来扩展

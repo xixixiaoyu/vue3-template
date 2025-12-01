@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { setupProgressGuard } from '@/middleware/progress'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -36,9 +35,6 @@ const router = createRouter({
     },
   ],
 })
-
-// 设置进度条守卫
-setupProgressGuard(router)
 
 // 路由守卫
 router.beforeEach(async (to, from, next) => {

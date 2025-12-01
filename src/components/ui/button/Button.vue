@@ -34,7 +34,7 @@ defineOptions({
   name: 'UiButton',
 })
 
-interface ButtonProps extends VariantProps<typeof buttonVariants> {
+interface ButtonProps extends /* @vue-ignore */ VariantProps<typeof buttonVariants> {
   as?: string
   class?: string
   disabled?: boolean

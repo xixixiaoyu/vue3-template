@@ -273,8 +273,8 @@ export const useAuthStore = defineStore(
 
     return {
       // 状态
-      user: readonly(user),
-      session: readonly(session),
+      user,
+      session,
       loading: readonly(loading),
       error: readonly(error),
 

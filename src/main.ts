@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createPersistedState } from 'pinia-plugin-persistedstate'
+import { createHead } from '@unhead/vue/client'
 import VueLazyload from 'vue-lazyload'
 import App from './App.vue'
 import router from './router'
@@ -32,10 +33,16 @@ use([
 
 import './assets/main.css'
 
+// 创建 head 实例
+const head = createHead()
+
 const app = createApp(App)
 
 // 初始化 Sentry 错误监控
 initSentry(app)
+
+// 安装 head 插件
+app.use(head)
 
 // 配置图片懒加载
 app.use(VueLazyload, {

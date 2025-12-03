@@ -14,7 +14,7 @@
     >
       <template #item="{ element, index }">
         <div
-          class="cursor-move select-none transition-all duration-200 ease-in-out hover:bg-primary/10"
+          class="cursor-move select-none transition-all duration-200 ease-in-out hover:bg-blue-100 dark:hover:bg-blue-900/20"
         >
           <slot name="item" :item="element" :index="index" />
         </div>
@@ -74,14 +74,21 @@ const onChange = (event: any) => {
 <style scoped>
 /* 拖拽时的样式 */
 :deep(.ghost) {
-  @apply opacity-50 bg-primary/10 border-2 border-dashed border-primary;
+  opacity: 0.5;
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 2px dashed rgb(59, 130, 246);
 }
 
 :deep(.chosen) {
-  @apply bg-primary/10 border-2 border-solid border-primary;
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 2px solid rgb(59, 130, 246);
 }
 
 :deep(.dragging) {
-  @apply opacity-80 rotate-3 shadow-lg;
+  opacity: 0.8;
+  transform: rotate(3deg);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 </style>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { cn } from '@/lib/utils'
 import LoadingSpinner from './LoadingSpinner.vue'
 
 interface Props {
@@ -14,11 +13,13 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const overlayClasses = computed(() => {
-  return cn(
+  return [
     'fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity duration-300',
     props.show ? 'opacity-100' : 'opacity-0 pointer-events-none',
-    props.class
-  )
+    props.class || '',
+  ]
+    .filter(Boolean)
+    .join(' ')
 })
 </script>
 

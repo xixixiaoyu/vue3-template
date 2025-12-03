@@ -4,7 +4,8 @@ import { useAuthStore } from '@/stores/auth'
 import { setupGlobalErrorHandler } from '@/composables/useErrorHandler'
 import { useGlobalLoading } from '@/composables/useLoading'
 import { RouterView } from 'vue-router'
-import { NotificationContainer, LoadingOverlay } from '@/components/ui'
+import { NotificationContainer } from '@/components/ui/notification'
+import { LoadingOverlay } from '@/components/ui/loading'
 
 const authStore = useAuthStore()
 const { isLoading } = useGlobalLoading()
@@ -18,7 +19,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <RouterView />
     <NotificationContainer />
     <LoadingOverlay :show="isLoading" message="加载中..." />

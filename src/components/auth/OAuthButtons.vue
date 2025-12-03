@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { Button } from '@/components/ui'
 import type { OAuthProvider } from '@/types/database.types'
 
 interface Props {
@@ -81,28 +80,29 @@ const buttonSizeClass = computed(() => {
   <div class="w-full space-y-3">
     <!-- OAuth 按钮 -->
     <div class="grid grid-cols-2 gap-2">
-      <Button
+      <button
         v-for="provider in oauthProviders"
         :key="provider.provider"
-        variant="outline"
         :disabled="isLoading"
-        :class="`w-full ${buttonSizeClass} justify-start gap-2 border-gray-300 hover:bg-gray-50`"
+        :class="`w-full ${buttonSizeClass} flex items-center justify-start gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50`"
         @click="handleOAuthLogin(provider.provider)"
       >
         <svg :class="`h-4 w-4`" viewBox="0 0 24 24" fill="currentColor">
           <path :d="provider.icon" />
         </svg>
         <span class="truncate">{{ provider.name }}</span>
-      </Button>
+      </button>
     </div>
 
     <!-- 分割线 -->
     <div v-if="showDivider" class="relative">
       <div class="absolute inset-0 flex items-center">
-        <span class="w-full border-t" />
+        <span class="w-full border-t border-gray-300 dark:border-gray-600" />
       </div>
       <div class="relative flex justify-center text-xs uppercase">
-        <span class="bg-background px-2 text-muted-foreground"> 或使用邮箱 </span>
+        <span class="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400"
+          >或使用邮箱</span
+        >
       </div>
     </div>
   </div>

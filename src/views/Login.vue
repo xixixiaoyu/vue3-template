@@ -9,16 +9,6 @@ import { useAuthStore } from '@/stores/auth'
 import { useFormValidation, validationRules, useSeo, useAutoAnimate } from '@/composables'
 import { z } from 'zod'
 import { LogIn, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-vue-next'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Input,
-  Label,
-} from '@/components/ui'
 import OAuthButtons from '@/components/auth/OAuthButtons.vue'
 
 const router = useRouter()
@@ -78,37 +68,40 @@ const [, setParent] = useAutoAnimate()
 
 <template>
   <div
-    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4"
+    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4"
   >
     <div class="w-full max-w-md">
       <!-- 品牌标识区域 -->
       <div class="text-center mb-8">
         <div
-          class="mx-auto h-16 w-16 flex items-center justify-center rounded-2xl bg-primary shadow-lg shadow-primary/25 mb-6 transition-all duration-300 hover:scale-105"
+          class="mx-auto h-16 w-16 flex items-center justify-center rounded-2xl bg-blue-600 shadow-lg mb-6 transition-all duration-300 hover:scale-105"
         >
-          <LogIn class="h-8 w-8 text-primary-foreground" />
+          <LogIn class="h-8 w-8 text-white" />
         </div>
-        <h1 class="text-4xl font-bold text-foreground mb-3 tracking-tight">欢迎回来</h1>
-        <p class="text-muted-foreground text-lg leading-relaxed">登录您的账户以继续使用</p>
+        <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-3 tracking-tight">
+          欢迎回来
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400 text-lg leading-relaxed">
+          登录您的账户以继续使用
+        </p>
       </div>
 
       <!-- 登录卡片 -->
-      <Card class="shadow-xl border-0 backdrop-blur-sm bg-card/95">
-        <CardHeader class="space-y-2 pb-6">
-          <CardTitle class="text-2xl font-semibold text-center">登录</CardTitle>
-          <CardDescription class="text-center text-base leading-relaxed">
+      <div class="shadow-xl border-0 backdrop-blur-sm bg-white dark:bg-gray-800 rounded-lg">
+        <div class="space-y-2 pb-6 p-6">
+          <h2 class="text-2xl font-semibold text-center text-gray-900 dark:text-white">登录</h2>
+          <p class="text-center text-base leading-relaxed text-gray-600 dark:text-gray-400">
             还没有账户？
-            <Button
-              variant="link"
+            <button
               @click="goToRegister"
-              class="p-0 h-auto font-normal text-primary hover:text-primary/80 transition-colors"
+              class="p-0 h-auto font-normal text-blue-600 hover:text-blue-700 transition-colors bg-transparent border-none cursor-pointer"
             >
               立即注册
-            </Button>
-          </CardDescription>
-        </CardHeader>
+            </button>
+          </p>
+        </div>
 
-        <CardContent class="space-y-6">
+        <div class="space-y-6 p-6 pt-0">
           <!-- OAuth 登录 -->
           <OAuthButtons :redirect-path="($route.query.redirect as string) || '/'" />
           <!-- 错误提示 -->
@@ -259,11 +252,11 @@ const [, setParent] = useAutoAnimate()
               </Button>
             </div>
           </form>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <!-- 底部信息 -->
-      <div class="text-center mt-6 text-sm text-muted-foreground/80 leading-relaxed">
+      <div class="text-center mt-6 text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
         <p>登录即表示您同意我们的服务条款和隐私政策</p>
       </div>
     </div>

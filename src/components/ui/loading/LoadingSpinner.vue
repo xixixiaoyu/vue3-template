@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { cn } from '@/lib/utils'
 
 interface Props {
   size?: 'sm' | 'md' | 'lg'
@@ -31,13 +30,13 @@ const colorClasses = computed(() => {
     case 'white':
       return 'text-white'
     default:
-      return 'text-primary dark:text-primary-foreground'
+      return 'text-blue-600 dark:text-blue-400'
   }
 })
 </script>
 
 <template>
-  <div :class="cn('animate-spin', sizeClasses, colorClasses, props.class)">
+  <div :class="`animate-spin ${sizeClasses} ${colorClasses} ${props.class || ''}`">
     <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
       <circle
         class="opacity-25"

@@ -1,11 +1,17 @@
 <template>
   <div class="upload-example container mx-auto p-6">
-    <Card>
-      <CardHeader>
-        <CardTitle>Vue Query 和文件上传示例</CardTitle>
-        <CardDescription> 使用 Vue Query 和文件上传 composables 的示例页面 </CardDescription>
-      </CardHeader>
-      <CardContent class="space-y-6">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700"
+    >
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+          Vue Query 和文件上传示例
+        </h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+          使用 Vue Query 和文件上传 composables 的示例页面
+        </p>
+      </div>
+      <div class="p-6 space-y-6">
         <!-- 基础文件上传 -->
         <div>
           <h3 class="text-lg font-medium mb-4">基础文件上传</h3>
@@ -32,7 +38,12 @@
               <UploadCloud class="mx-auto h-12 w-12 text-gray-400" />
               <p class="text-lg font-medium text-gray-900">点击或拖拽文件到此处上传</p>
               <p class="text-sm text-gray-500">支持图片、PDF、Word 文档 (最大 10MB)</p>
-              <Button @click="triggerFileSelect" variant="outline"> 选择文件 </Button>
+              <button
+                @click="triggerFileSelect"
+                class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+              >
+                选择文件
+              </button>
             </div>
           </div>
         </div>
@@ -64,15 +75,19 @@
               </div>
 
               <div class="flex items-center space-x-2">
-                <Button variant="outline" size="sm" @click="downloadFile(file)"> 下载 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <button
+                  class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                  @click="downloadFile(file)"
+                >
+                  下载
+                </button>
+                <button
+                  class="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
                   @click="deleteFile(file.id)"
                   :disabled="deleteMutation.isPending.value"
                 >
                   删除
-                </Button>
+                </button>
               </div>
             </div>
           </div>
@@ -90,32 +105,33 @@
             </div>
 
             <div class="flex items-center space-x-2">
-              <Button variant="outline" size="sm" @click="prevPage" :disabled="currentPage <= 1">
+              <button
+                class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                @click="prevPage"
+                :disabled="currentPage <= 1"
+              >
                 上一页
-              </Button>
+              </button>
 
-              <span class="text-sm"> 第 {{ currentPage }} 页，共 {{ totalPages }} 页 </span>
+              <span class="text-sm">第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
 
-              <Button
-                variant="outline"
-                size="sm"
+              <button
+                class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                 @click="nextPage"
                 :disabled="currentPage >= totalPages"
               >
                 下一页
-              </Button>
+              </button>
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { LoadingSpinner } from '@/components/ui/loading'
 import { File, UploadCloud } from 'lucide-vue-next'
 import {

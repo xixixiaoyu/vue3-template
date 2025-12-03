@@ -1,5 +1,4 @@
-// cn 函数已移至 lib/utils.ts，请从那里导入
-export { cn } from '@/lib/utils'
+// 工具函数导出文件
 
 // 获取文件扩展名
 export function getFileExtension(filename: string): string {

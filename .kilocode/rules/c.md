@@ -21,11 +21,13 @@
 
 ### UI 与交互
 
-- **shadcn-vue** - 基于 Radix Vue 的组件库
+- **Naive UI** - Vue 3 组件库，主题可定制，TypeScript 支持
+- **@vicons/ionicons5** - Ionicons 图标库
 - **lucide-vue-next** - 现代化图标库
 - **@formkit/auto-animate** - 流畅的动画效果
 - **@tanstack/vue-virtual** - 虚拟滚动组件
 - **vuedraggable** - 拖拽功能
+- **vue-upload-component** - 文件上传组件
 
 ### 数据处理与工具
 
@@ -34,6 +36,7 @@
 - **date-fns** - 日期处理工具，支持中文本地化
 - **lodash-es** - 常用工具函数集合
 - **zod** + **vee-validate** - 表单验证
+- **echarts** - 数据可视化图表库
 
 ### 开发工具与监控
 
@@ -41,11 +44,14 @@
 - **@sentry/vue** - 错误监控和性能分析
 - **Vitest** + **Playwright** - 单元测试和 E2E 测试
 - **ESLint** + **Prettier** + **Husky** - 代码质量和格式化
+- **lint-staged** - Git 暂存文件检查
+- **@vueuse/core** - Vue 组合式工具集
 
 ### 国际化与 PWA
 
 - **Vue I18n** - 国际化支持
 - **Vite PWA** - 渐进式 Web 应用支持
+- **@unhead/vue** - 现代 HTML 文档头管理
 
 ## 项目结构
 
@@ -54,7 +60,7 @@ src/
 ├── api/              # API 调用封装
 ├── assets/           # 静态资源
 ├── components/       # 可复用组件
-│   ├── ui/          # 基础 UI 组件（shadcn-vue）
+│   ├── ui/          # 基础 UI 组件（Naive UI）
 │   └── auth/        # 认证相关组件
 ├── composables/      # 组合式函数（Vue 3 Composition API）
 ├── constants/        # 常量定义
@@ -64,7 +70,8 @@ src/
 │   ├── date.ts      # 日期处理工具
 │   ├── lodash.ts    # 工具函数库
 │   ├── vue-query.ts # Vue Query 封装
-│   └── sentry.ts    # Sentry 错误监控配置
+│   ├── sentry.ts    # Sentry 错误监控配置
+│   └── utils.ts     # 通用工具函数
 ├── locales/         # 国际化文件
 ├── middleware/      # 路由中间件
 ├── router/          # 路由配置和守卫
@@ -115,7 +122,7 @@ src/
 
 ### UI 组件
 
-- 基于 shadcn-vue 的完整组件库
+- 基于 Naive UI 的完整组件库
 - 响应式设计
 - 暗色模式支持
 - 动画和过渡效果
@@ -307,17 +314,40 @@ pnpm dev
 # 构建生产版本
 pnpm build
 
+# 预览构建结果
+pnpm preview
+
 # 运行测试
 pnpm test
+pnpm test:ui
+pnpm test:run
+pnpm test:coverage
+
+# E2E 测试
+pnpm test:e2e
+pnpm test:e2e:ui
+pnpm test:e2e:debug
+pnpm test:e2e:codegen
+pnpm test:e2e:install
 
 # 代码检查和格式化
 pnpm lint
 pnpm format
+pnpm format:check
+pnpm type-check
 
 # 数据库操作
 pnpm db:init
 pnpm db:migrate
 pnpm db:reset
+pnpm db:types
+
+# Supabase 操作
+pnpm supabase:start
+pnpm supabase:stop
+
+# 构建分析
+pnpm build:analyze
 ```
 
 ## 最佳实践

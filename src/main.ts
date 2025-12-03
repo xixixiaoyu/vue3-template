@@ -8,6 +8,25 @@ import router from './router'
 import i18n from './locales'
 import { initSentry } from './lib/sentry'
 
+// Naive UI 导入
+import {
+  create,
+  NConfigProvider,
+  NButton,
+  NCard,
+  NInput,
+  NForm,
+  NFormItem,
+  NMessageProvider,
+  NDialogProvider,
+  NNotificationProvider,
+  NLoadingBarProvider,
+} from 'naive-ui'
+
+// 导入字体
+import 'vfonts/Lato.css'
+import 'vfonts/FiraCode.css'
+
 import './assets/main.css'
 
 // 创建 head 实例
@@ -40,9 +59,26 @@ const app = createApp(App)
 // 初始化 Sentry 错误监控
 initSentry(app)
 
+// 创建 Naive UI 实例
+const naive = create({
+  components: [
+    NConfigProvider,
+    NButton,
+    NCard,
+    NInput,
+    NForm,
+    NFormItem,
+    NMessageProvider,
+    NDialogProvider,
+    NNotificationProvider,
+    NLoadingBarProvider,
+  ],
+})
+
 // 安装插件
 app.use(head)
 app.use(VueQueryPlugin, { queryClient })
+app.use(naive)
 
 // 创建 pinia 实例并添加持久化插件
 const pinia = createPinia()

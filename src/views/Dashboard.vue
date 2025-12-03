@@ -13,12 +13,32 @@
         </div>
 
         <div class="flex items-center space-x-4">
+          <!-- 主题切换按钮 -->
+          <n-button circle @click="toggleTheme" size="small">
+            <template #icon>
+              <n-icon>
+                <Sun v-if="isDark" />
+                <Moon v-else />
+              </n-icon>
+            </template>
+          </n-button>
+
+          <!-- 语言切换按钮 -->
+          <n-button circle @click="toggleLocale" size="small">
+            <template #icon>
+              <n-icon>
+                <Languages />
+              </n-icon>
+            </template>
+          </n-button>
+
           <!-- 用户信息 -->
-          <n-dropdown trigger="hover" :options="userMenuOptions">
+          <n-dropdown trigger="hover" :options="userMenuOptions" @select="handleUserMenuSelect">
             <div class="flex items-center space-x-3 cursor-pointer">
               <n-avatar
                 round
                 size="small"
+                :src="userAvatar"
                 :fallback-style="{ backgroundColor: '#2563eb', color: 'white' }"
               >
                 <n-icon size="16">
@@ -58,36 +78,127 @@
             }}
           </n-p>
 
+          <!-- 统计卡片 -->
+          <n-grid :cols="1" :x-gap="16" :y-gap="16" responsive="screen" class="mb-6">
+            <n-grid-item :span="1" :s="2" :m="2" :l="3">
+              <n-card hoverable class="stat-card">
+                <n-statistic label="总用户数" value="1,234">
+                  <template #prefix>
+                    <n-icon color="#18a058">
+                      <Users />
+                    </n-icon>
+                  </template>
+                </n-statistic>
+              </n-card>
+            </n-grid-item>
+            <n-grid-item :span="1" :s="2" :m="2" :l="3">
+              <n-card hoverable class="stat-card">
+                <n-statistic label="活跃用户" value="892">
+                  <template #prefix>
+                    <n-icon color="#2080f0">
+                      <UserCheck />
+                    </n-icon>
+                  </template>
+                </n-statistic>
+              </n-card>
+            </n-grid-item>
+            <n-grid-item :span="1" :s="2" :m="2" :l="3">
+              <n-card hoverable class="stat-card">
+                <n-statistic label="新用户" value="156">
+                  <template #prefix>
+                    <n-icon color="#f0a020">
+                      <UserPlus />
+                    </n-icon>
+                  </template>
+                </n-statistic>
+              </n-card>
+            </n-grid-item>
+            <n-grid-item :span="1" :s="2" :m="2" :l="3">
+              <n-card hoverable class="stat-card">
+                <n-statistic label="转化率" value="12.5%" suffix="%">
+                  <template #prefix>
+                    <n-icon color="#d03050">
+                      <TrendingUp />
+                    </n-icon>
+                  </template>
+                </n-statistic>
+              </n-card>
+            </n-grid-item>
+          </n-grid>
+
           <!-- 快速操作卡片 -->
           <n-grid :cols="1" :x-gap="16" :y-gap="16" responsive="screen">
-            <n-grid-item :span="1" s:2 m:2 l:1>
-              <n-card hoverable>
+            <n-grid-item :span="1" :s="2" :m="2" :l="1">
+              <n-card hoverable class="action-card">
                 <template #header>
                   <div class="flex items-center gap-2">
                     <n-icon size="20">
-                      <Globe />
+                      <Settings />
                     </n-icon>
                     {{ t('navigation.settings') }}
                   </div>
                 </template>
-                <n-p depth="3">
-                  {{ t('dashboard.description') || '主仪表板页面' }}
+                <n-p depth="3" class="mb-4">
+                  {{ t('dashboard.settingsDescription') || '管理您的账户设置和偏好' }}
                 </n-p>
+                <n-button @click="goToSettings" type="primary" block>
+                  {{ t('common.manage') }}
+                </n-button>
               </n-card>
             </n-grid-item>
 
-            <n-grid-item :span="1" s:2 m:2 l:1>
-              <n-card hoverable>
+            <n-grid-item :span="1" :s="2" :m="2" :l="1">
+              <n-card hoverable class="action-card">
                 <template #header>
                   <div class="flex items-center gap-2">
                     <n-icon size="20">
                       <Package />
                     </n-icon>
-                    新功能
+                    {{ t('dashboard.features') || '新功能' }}
                   </div>
                 </template>
-                <n-p depth="3" class="mb-4"> 查看所有新增的功能和组件 </n-p>
+                <n-p depth="3" class="mb-4">
+                  {{ t('dashboard.featuresDescription') || '查看所有新增的功能和组件' }}
+                </n-p>
                 <n-button @click="goToFeatures" type="primary" block>
+                  {{ t('common.view') }}
+                </n-button>
+              </n-card>
+            </n-grid-item>
+
+            <n-grid-item :span="1" :s="2" :m="2" :l="1">
+              <n-card hoverable class="action-card">
+                <template #header>
+                  <div class="flex items-center gap-2">
+                    <n-icon size="20">
+                      <BarChart3 />
+                    </n-icon>
+                    {{ t('dashboard.analytics') || '数据分析' }}
+                  </div>
+                </template>
+                <n-p depth="3" class="mb-4">
+                  {{ t('dashboard.analyticsDescription') || '查看详细的数据分析和报告' }}
+                </n-p>
+                <n-button @click="goToAnalytics" type="primary" block>
+                  {{ t('common.view') }}
+                </n-button>
+              </n-card>
+            </n-grid-item>
+
+            <n-grid-item :span="1" :s="2" :m="2" :l="1">
+              <n-card hoverable class="action-card">
+                <template #header>
+                  <div class="flex items-center gap-2">
+                    <n-icon size="20">
+                      <FileText />
+                    </n-icon>
+                    {{ t('dashboard.reports') || '报告' }}
+                  </div>
+                </template>
+                <n-p depth="3" class="mb-4">
+                  {{ t('dashboard.reportsDescription') || '生成和查看各类业务报告' }}
+                </n-p>
+                <n-button @click="goToReports" type="primary" block>
                   {{ t('common.view') }}
                 </n-button>
               </n-card>
@@ -100,43 +211,53 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h } from 'vue'
+import { computed, h, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { User, LogOut, Home, Package, Settings, UserCircle } from 'lucide-vue-next'
+import {
+  User,
+  LogOut,
+  Home,
+  Package,
+  Settings,
+  UserCircle,
+  Sun,
+  Moon,
+  Languages,
+  Users,
+  UserCheck,
+  UserPlus,
+  TrendingUp,
+  BarChart3,
+  FileText,
+} from 'lucide-vue-next'
 import { useLocale } from '@/composables/useI18n'
 import { useMessage, useDialog } from 'naive-ui'
 import type { DropdownOption } from 'naive-ui'
 
-const { t } = useLocale()
+const { t, toggleLocale } = useLocale()
 const router = useRouter()
 const authStore = useAuthStore()
 const message = useMessage()
 const dialog = useDialog()
 
+// 主题状态
+const isDark = ref(false)
+
 // 计算属性
 const userEmail = computed(() => authStore.user?.email || '')
-const userName = computed(() => {
-  const user = authStore.user
-  if (!user) return ''
-
-  // 尝试从 user_metadata 中获取姓名，如果没有则使用邮箱前缀
-  const nameFromMetadata = user.user_metadata?.name || user.user_metadata?.full_name
-  if (nameFromMetadata) return nameFromMetadata
-
-  // 如果没有姓名，使用邮箱前缀
-  return userEmail.value.split('@')[0]
-})
+const userName = computed(() => authStore.userName)
+const userAvatar = computed(() => authStore.userAvatar)
 
 // 用户菜单选项
 const userMenuOptions = computed<DropdownOption[]>(() => [
   {
-    label: '个人资料',
+    label: t('navigation.profile'),
     key: 'profile',
     icon: () => h('div', { class: 'flex items-center' }, [h(UserCircle, { size: 16 })]),
   },
   {
-    label: '设置',
+    label: t('navigation.settings'),
     key: 'settings',
     icon: () => h('div', { class: 'flex items-center' }, [h(Settings, { size: 16 })]),
   },
@@ -144,20 +265,27 @@ const userMenuOptions = computed<DropdownOption[]>(() => [
     type: 'divider',
   },
   {
-    label: '退出登录',
+    label: t('auth.logout'),
     key: 'logout',
     icon: () => h('div', { class: 'flex items-center' }, [h(LogOut, { size: 16 })]),
   },
 ])
 
+// 切换主题
+const toggleTheme = () => {
+  isDark.value = !isDark.value
+  // 这里可以添加实际的主题切换逻辑
+  message.info(isDark.value ? '已切换到暗色主题' : '已切换到亮色主题')
+}
+
 // 处理用户菜单选择
 const handleUserMenuSelect = (key: string) => {
   switch (key) {
     case 'profile':
-      message.info('个人资料功能开发中')
+      message.info(t('navigation.profile') + '功能开发中')
       break
     case 'settings':
-      message.info('设置功能开发中')
+      goToSettings()
       break
     case 'logout':
       handleSignOut()
@@ -168,25 +296,57 @@ const handleUserMenuSelect = (key: string) => {
 // 退出登录
 const handleSignOut = () => {
   dialog.warning({
-    title: '确认退出',
-    content: '您确定要退出登录吗？',
-    positiveText: '确定',
-    negativeText: '取消',
+    title: t('common.confirm'),
+    content: t('auth.confirmLogout') || '您确定要退出登录吗？',
+    positiveText: t('common.confirm'),
+    negativeText: t('common.cancel'),
     onPositiveClick: async () => {
       const result = await authStore.signOut()
       if (result.success) {
-        message.success('退出登录成功')
-        // 退出成功，重定向到登录页
+        message.success(t('auth.logoutSuccess'))
         router.push({ name: 'login' })
       } else {
-        message.error('退出登录失败: ' + (result.error || '未知错误'))
+        message.error(t('auth.logoutFailed') + ': ' + (result.error || t('errors.unknown')))
       }
     },
   })
 }
 
-// 跳转到功能页面
+// 页面导航方法
+const goToSettings = () => {
+  router.push('/settings')
+}
+
 const goToFeatures = () => {
   router.push('/features')
 }
+
+const goToAnalytics = () => {
+  router.push('/analytics')
+}
+
+const goToReports = () => {
+  router.push('/reports')
+}
 </script>
+
+<style scoped>
+.stat-card {
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.action-card {
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+</style>

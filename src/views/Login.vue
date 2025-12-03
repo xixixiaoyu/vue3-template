@@ -6,13 +6,25 @@ defineOptions({
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useFormValidation, validationRules, useSeo, useAutoAnimate } from '@/composables'
+import {
+  useFormValidation,
+  validationRules,
+  useSeo,
+  useAutoAnimate,
+  useLocalStorageBoolean,
+  useLocalStorageString,
+} from '@/composables'
+import { useLocale } from '@/composables/useI18n'
 import { z } from 'zod'
-import { LogIn, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-vue-next'
+import { LogIn, Mail, Lock, Eye, EyeOff, Moon, Sun, Languages } from 'lucide-vue-next'
 import OAuthButtons from '@/components/auth/OAuthButtons.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
+
+// 本地存储记住我状态
+const { value: rememberMe } = useLocalStorageBoolean('rememberMe', false)
+const { state: savedEmail } = useLocalStorageString('savedEmail', '')
 
 // 定义表单验证 schema
 const loginSchema = z.object({
@@ -23,10 +35,21 @@ const loginSchema = z.object({
 // 使用表单验证
 const { fields, isSubmitting, serverError, handleSubmit } = useFormValidation({
   schema: loginSchema,
+  initialValues: {
+    email: rememberMe.value ? savedEmail.value : '',
+    password: '',
+  },
   onSubmit: async (values) => {
     const result = await authStore.signIn(values.email, values.password)
 
     if (result.success) {
+      // 如果选择记住我，保存邮箱
+      if (rememberMe.value) {
+        savedEmail.value = values.email
+      } else {
+        savedEmail.value = ''
+      }
+
       // 登录成功，重定向到仪表板
       router.push({ name: 'dashboard' })
     } else {
@@ -38,6 +61,7 @@ const { fields, isSubmitting, serverError, handleSubmit } = useFormValidation({
 
 // 表单状态
 const showPassword = ref(false)
+const isDark = ref(false)
 
 // 计算属性
 const isLoading = computed(() => isSubmitting.value || authStore.loading)
@@ -54,10 +78,37 @@ const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value
 }
 
+// 切换主题
+const toggleTheme = () => {
+  isDark.value = !isDark.value
+  // 这里可以添加实际的主题切换逻辑
+}
+
+// 忘记密码
+const handleForgotPassword = async () => {
+  if (!fields.email.value) {
+    // 使用表单验证的错误提示
+    fields.email.validate()
+    return
+  }
+
+  const result = await authStore.resetPassword(fields.email.value)
+  if (result.success) {
+    // 显示成功消息
+    console.log('密码重置邮件已发送')
+  } else {
+    // 显示错误消息
+    console.error('密码重置失败:', result.error)
+  }
+}
+
+// 获取国际化函数
+const { t, toggleLocale } = useLocale()
+
 // 设置 SEO 元数据
 useSeo({
-  title: '登录 - Vue 3 Supabase 模板',
-  description: '登录您的账户以访问我们的服务',
+  title: t('auth.login') + ' - Vue 3 Supabase 模板',
+  description: t('auth.loginDescription') || '登录您的账户以访问我们的服务',
   keywords: '登录,认证,Vue 3,Supabase',
   robots: 'noindex,nofollow',
 })
@@ -71,6 +122,28 @@ const [, setParent] = useAutoAnimate()
     class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4"
   >
     <div class="w-full max-w-md">
+      <!-- 顶部工具栏 -->
+      <div class="flex justify-between items-center mb-6">
+        <!-- 主题切换按钮 -->
+        <n-button circle @click="toggleTheme" size="small">
+          <template #icon>
+            <n-icon>
+              <Sun v-if="isDark" />
+              <Moon v-else />
+            </n-icon>
+          </template>
+        </n-button>
+
+        <!-- 语言切换按钮 -->
+        <n-button circle @click="toggleLocale" size="small">
+          <template #icon>
+            <n-icon>
+              <Languages />
+            </n-icon>
+          </template>
+        </n-button>
+      </div>
+
       <!-- 品牌标识区域 -->
       <div class="text-center mb-8">
         <n-avatar
@@ -82,18 +155,22 @@ const [, setParent] = useAutoAnimate()
             <LogIn />
           </n-icon>
         </n-avatar>
-        <n-h1 class="mb-3 tracking-tight"> 欢迎回来 </n-h1>
-        <n-p depth="3" class="text-lg leading-relaxed"> 登录您的账户以继续使用 </n-p>
+        <n-h1 class="mb-3 tracking-tight"> {{ t('auth.welcomeBack') || '欢迎回来' }} </n-h1>
+        <n-p depth="3" class="text-lg leading-relaxed">
+          {{ t('auth.loginSubtitle') || '登录您的账户以继续使用' }}
+        </n-p>
       </div>
 
       <!-- 登录卡片 -->
       <n-card>
         <div class="space-y-6">
           <div class="text-center">
-            <n-h2>登录</n-h2>
+            <n-h2>{{ t('auth.login') }}</n-h2>
             <n-p depth="3" class="text-base leading-relaxed">
-              还没有账户？
-              <n-button text type="primary" @click="goToRegister"> 立即注册 </n-button>
+              {{ t('auth.noAccount') || '还没有账户？' }}
+              <n-button text type="primary" @click="goToRegister">
+                {{ t('auth.register') || '立即注册' }}
+              </n-button>
             </n-p>
           </div>
 
@@ -109,14 +186,14 @@ const [, setParent] = useAutoAnimate()
               :validation-status="fields.email.errorMessage ? 'error' : undefined"
               :feedback="fields.email.errorMessage"
             >
-              <template #label> 邮箱地址 </template>
+              <template #label> {{ t('auth.email') }} </template>
               <n-input
                 v-model:value="fields.email.value"
                 @blur="fields.email.validate"
                 type="text"
                 inputmode="email"
                 autocomplete="email"
-                placeholder="your@email.com"
+                :placeholder="t('auth.emailPlaceholder') || 'your@email.com'"
                 size="large"
                 :input-props="{ class: 'pl-10' }"
               >
@@ -135,8 +212,10 @@ const [, setParent] = useAutoAnimate()
             >
               <template #label>
                 <div class="flex items-center justify-between w-full">
-                  <span>密码</span>
-                  <n-button text type="primary" size="tiny"> 忘记密码？ </n-button>
+                  <span>{{ t('auth.password') }}</span>
+                  <n-button text type="primary" size="tiny" @click="handleForgotPassword">
+                    {{ t('auth.forgotPassword') }}
+                  </n-button>
                 </div>
               </template>
               <n-input
@@ -144,7 +223,7 @@ const [, setParent] = useAutoAnimate()
                 @blur="fields.password.validate"
                 :type="showPassword ? 'text' : 'password'"
                 autocomplete="current-password"
-                placeholder="••••••••"
+                :placeholder="t('auth.passwordPlaceholder') || '••••••••'"
                 size="large"
                 :input-props="{ class: 'pl-10 pr-10' }"
               >
@@ -171,7 +250,7 @@ const [, setParent] = useAutoAnimate()
 
             <!-- 记住我和提交按钮 -->
             <div class="space-y-4">
-              <n-checkbox> 记住我 </n-checkbox>
+              <n-checkbox v-model:checked="rememberMe"> {{ t('auth.rememberMe') }} </n-checkbox>
 
               <n-button
                 type="primary"
@@ -180,7 +259,7 @@ const [, setParent] = useAutoAnimate()
                 block
                 @click="handleSubmit"
               >
-                {{ isLoading ? '登录中...' : '登录' }}
+                {{ isLoading ? t('auth.loggingIn') || '登录中...' : t('auth.login') }}
               </n-button>
             </div>
           </form>
@@ -190,7 +269,7 @@ const [, setParent] = useAutoAnimate()
       <!-- 底部信息 -->
       <div class="text-center mt-6">
         <n-text depth="3" class="text-sm leading-relaxed">
-          登录即表示您同意我们的服务条款和隐私政策
+          {{ t('auth.termsNotice') || '登录即表示您同意我们的服务条款和隐私政策' }}
         </n-text>
       </div>
     </div>

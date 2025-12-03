@@ -67,7 +67,10 @@
     "minimize": "Minimize",
     "fullscreen": "Fullscreen",
     "exitFullscreen": "Exit Fullscreen",
-    "manage": "Manage"
+    "manage": "Manage",
+    "language": "Language",
+    "theme": "Theme",
+    "or": "Or"
   },
   "auth": {
     "login": "Login",
@@ -96,7 +99,29 @@
     "passwordTooShort": "Password must be at least 8 characters",
     "accountExists": "Account already exists",
     "accountNotFound": "Account not found",
-    "sessionExpired": "Session expired, please login again"
+    "sessionExpired": "Session expired, please login again",
+    "welcomeBack": "Welcome Back",
+    "loginSubtitle": "Sign in to your account to continue",
+    "noAccount": "Don't have an account?",
+    "emailPlaceholder": "your@email.com",
+    "passwordPlaceholder": "••••••••",
+    "loggingIn": "Signing in...",
+    "termsNotice": "By signing in, you agree to our Terms of Service and Privacy Policy",
+    "createAccount": "Create New Account",
+    "registerSubtitle": "Register to start using our services",
+    "hasAccount": "Already have an account?",
+    "name": "Name",
+    "namePlaceholder": "Enter your name",
+    "agreeToTerms": "I agree to",
+    "termsOfService": "Terms of Service",
+    "and": "and",
+    "privacyPolicy": "Privacy Policy",
+    "registering": "Registering...",
+    "registerTermsNotice": "By registering, you agree to our Terms of Service and Privacy Policy",
+    "registrationSuccessful": "Registration Successful",
+    "registrationSuccessMessage": "Your account has been created successfully, redirecting to dashboard...",
+    "loginDescription": "Sign in to your account to access our services",
+    "registerDescription": "Create a new account to start using our services"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -177,7 +202,14 @@
     "features": "New Features",
     "featuresDescription": "View all new features and components",
     "analyticsDescription": "View detailed data analysis and reports",
-    "reportsDescription": "Generate and view various business reports"
+    "reportsDescription": "Generate and view various business reports",
+    "totalUsersLabel": "Total Users",
+    "activeUsersLabel": "Active Users",
+    "newUsersLabel": "New Users",
+    "conversionRateLabel": "Conversion Rate",
+    "darkThemeOn": "Switched to dark theme",
+    "lightThemeOn": "Switched to light theme",
+    "profileInDevelopment": "Profile feature is under development"
   },
   "pwa": {
     "installTitle": "Install App",
@@ -188,5 +220,100 @@
     "update": "Update",
     "offline": "Offline Mode",
     "online": "Online Mode"
+  },
+  "oauth": {
+    "orUseEmail": "Or use email",
+    "loginFailed": "OAuth login failed"
+  },
+  "validation": {
+    "passwordConfirm": "Please confirm password",
+    "nameMinLength": "Name must be at least 2 characters",
+    "nameMaxLength": "Name cannot exceed 50 characters",
+    "agreeToTermsRequired": "Please agree to Terms of Service and Privacy Policy",
+    "passwordMismatch": "Passwords do not match"
+  },
+  "passwordStrength": {
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong"
+  },
+  "fileUpload": {
+    "unsupportedType": "Unsupported file type. Supported types: ",
+    "unsupportedFormat": "Unsupported file format. Supported formats: ",
+    "fileTooLarge": "File size exceeds limit. Maximum allowed size: ",
+    "unrecognizedType": "Unrecognized file type",
+    "uploadFailed": "File upload failed",
+    "deleteFailed": "File deletion failed",
+    "getInfoFailed": "Failed to get file info",
+    "downloadFailed": "File download failed",
+    "previewFailed": "Failed to generate preview"
+  },
+  "errorMessages": {
+    "networkError": "Network connection failed, please check your network settings",
+    "requestFailed": "Network request failed, please try again later",
+    "requestTimeout": "Request timeout, please try again later",
+    "unauthorized": "You do not have permission to perform this operation",
+    "forbidden": "Access denied",
+    "notFound": "The requested resource does not exist",
+    "internalServerError": "Internal server error, please try again later",
+    "serviceUnavailable": "Service temporarily unavailable, please try again later",
+    "submitFailed": "Submission failed, please try again",
+    "formSubmitFailed": "Form submission failed",
+    "loginFailedMsg": "Login failed, please try again",
+    "registerFailedMsg": "Registration failed, please try again",
+    "oauthLoginFailed": "OAuth login failed",
+    "passwordResetFailed": "Password reset failed",
+    "passwordUpdateFailed": "Password update failed",
+    "profileUpdateFailed": "Profile update failed",
+    "sessionRefreshFailed": "Session refresh failed",
+    "logoutFailedMsg": "Logout failed",
+    "authInitFailed": "Authentication initialization failed",
+    "storageSaveFailed": "Failed to save to local storage",
+    "storageDeleteFailed": "Failed to delete from local storage",
+    "storageClearFailed": "Failed to clear local storage",
+    "deserializeAuthFailed": "Failed to deserialize authentication data",
+    "realtimeEventFailed": "Failed to handle realtime event",
+    "parseStorageDataFailed": "Failed to parse local storage data"
+  },
+  "validationRules": {
+    "required": "This field is required",
+    "emailInvalid": "Please enter a valid email address",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "phoneInvalid": "Please enter a valid phone number",
+    "urlInvalid": "Please enter a valid URL",
+    "numberInvalid": "Please enter a valid number",
+    "numberMin": "Value cannot be less than {min}",
+    "numberMax": "Value cannot be greater than {max}",
+    "minLength": "Must be at least {length} characters",
+    "maxLength": "Cannot exceed {length} characters",
+    "rangeMin": "Value cannot be less than {min}",
+    "rangeMax": "Value cannot be greater than {max}"
+  },
+  "realtime": {
+    "connectionError": "Connection error",
+    "connectionTimeout": "Connection timeout",
+    "connected": "Connected",
+    "disconnected": "Disconnected"
+  },
+  "supabase": {
+    "envNotSet": "Supabase environment variables not set. Please ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are configured in your .env file.",
+    "prodEnvNotSet": "Supabase environment variables not set. Please ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are configured in production."
+  },
+  "api": {
+    "requestFailed": "Request failed",
+    "searchKeywordEmpty": "Search keyword cannot be empty"
+  },
+  "http": {
+    "requestError": "Request error",
+    "requestParamError": "Request parameter error",
+    "authFailed": "Authentication failed",
+    "unauthorizedMsg": "Unauthorized, please login again",
+    "permissionError": "Permission error",
+    "accessDenied": "Access denied",
+    "resourceNotFound": "Requested resource not found",
+    "serverError": "Server error",
+    "internalServerErrorMsg": "Internal server error",
+    "networkConnectionFailed": "Network connection failed, please check your network",
+    "configError": "Request configuration error"
   }
 }

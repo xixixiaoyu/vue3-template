@@ -21,6 +21,17 @@ import {
   NDialogProvider,
   NNotificationProvider,
   NLoadingBarProvider,
+  NH2,
+  NP,
+  NStatistic,
+  NGrid,
+  NGridItem,
+  NLayout,
+  NLayoutHeader,
+  NLayoutContent,
+  NIcon,
+  NAvatar,
+  NDropdown,
 } from 'naive-ui'
 
 // 导入字体
@@ -72,6 +83,17 @@ const naive = create({
     NDialogProvider,
     NNotificationProvider,
     NLoadingBarProvider,
+    NH2,
+    NP,
+    NStatistic,
+    NGrid,
+    NGridItem,
+    NLayout,
+    NLayoutHeader,
+    NLayoutContent,
+    NIcon,
+    NAvatar,
+    NDropdown,
   ],
 })
 

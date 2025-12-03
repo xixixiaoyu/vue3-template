@@ -86,20 +86,20 @@ const setupSystemThemeListener = () => {
   return () => {}
 }
 
+// 设置系统主题监听器
+const cleanupThemeListener = setupSystemThemeListener()
+
 // 在应用启动时初始化认证状态
 onMounted(async () => {
   await authStore.initialize()
-
   // 设置全局错误处理
   setupGlobalErrorHandler()
+})
 
-  // 设置系统主题监听器
-  const cleanupThemeListener = setupSystemThemeListener()
-
-  // 组件卸载时清理监听器
-  onUnmounted(() => {
-    cleanupThemeListener()
-  })
+// 在组件卸载时清理资源
+onUnmounted(() => {
+  cleanupThemeListener()
+  // 这里可以添加其他清理逻辑
 })
 
 // 提供全局主题切换方法

@@ -1,138 +1,128 @@
 <template>
   <div class="upload-example container mx-auto p-6">
-    <div
-      class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700"
-    >
-      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-          Vue Query 和文件上传示例
-        </h2>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-          使用 Vue Query 和文件上传 composables 的示例页面
-        </p>
-      </div>
-      <div class="p-6 space-y-6">
-        <!-- 基础文件上传 -->
+    <n-card>
+      <template #header>
         <div>
-          <h3 class="text-lg font-medium mb-4">基础文件上传</h3>
-          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-            <input
-              ref="fileInput"
-              type="file"
-              multiple
-              accept="image/*,.pdf,.doc,.docx"
-              @change="handleFileSelect"
-              class="hidden"
-            />
-            <div v-if="isUploading" class="space-y-4">
-              <LoadingSpinner />
-              <p class="text-sm text-gray-600">上传中... {{ uploadProgress }}%</p>
-              <div class="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                  :style="{ width: `${uploadProgress}%` }"
-                ></div>
-              </div>
-            </div>
-            <div v-else class="space-y-4">
-              <UploadCloud class="mx-auto h-12 w-12 text-gray-400" />
-              <p class="text-lg font-medium text-gray-900">点击或拖拽文件到此处上传</p>
-              <p class="text-sm text-gray-500">支持图片、PDF、Word 文档 (最大 10MB)</p>
-              <button
-                @click="triggerFileSelect"
-                class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                选择文件
-              </button>
-            </div>
-          </div>
+          <n-h2 class="mb-1">Vue Query 和文件上传示例</n-h2>
+          <n-p depth="3"> 使用 Vue Query 和文件上传 composables 的示例页面 </n-p>
         </div>
+      </template>
+
+      <n-space vertical size="large">
+        <!-- 基础文件上传 -->
+        <n-card>
+          <template #header>
+            <n-h3>基础文件上传</n-h3>
+          </template>
+
+          <n-upload
+            ref="uploadRef"
+            multiple
+            directory-dnd
+            :max="5"
+            :file-list="fileList"
+            :custom-request="handleUpload"
+            @change="handleFileChange"
+            @remove="handleFileRemove"
+            accept="image/*,.pdf,.doc,.docx"
+          >
+            <n-upload-dragger>
+              <div style="margin-bottom: 12px">
+                <n-icon size="48" depth="3">
+                  <UploadCloud />
+                </n-icon>
+              </div>
+              <n-text style="font-size: 16px"> 点击或者拖动文件到该区域来上传 </n-text>
+              <n-p depth="3" style="margin: 8px 0 0 0"> 支持图片、PDF、Word 文档 (最大 10MB) </n-p>
+            </n-upload-dragger>
+          </n-upload>
+
+          <!-- 上传进度 -->
+          <n-progress
+            v-if="isUploading"
+            type="line"
+            :percentage="uploadProgress"
+            :show-indicator="true"
+            class="mt-4"
+          />
+        </n-card>
 
         <!-- Vue Query 数据展示 -->
-        <div>
-          <h3 class="text-lg font-medium mb-4">上传的文件列表</h3>
-          <div v-if="isLoading" class="flex items-center justify-center py-8">
-            <LoadingSpinner />
-            <span class="ml-2">加载中...</span>
-          </div>
+        <n-card>
+          <template #header>
+            <n-h3>上传的文件列表</n-h3>
+          </template>
 
-          <div v-else-if="error" class="text-red-600 py-4">加载失败: {{ error }}</div>
-
-          <div v-else-if="uploadedFiles && uploadedFiles.length > 0" class="space-y-2">
-            <div
-              v-for="file in uploadedFiles"
-              :key="file.id"
-              class="flex items-center justify-between p-3 border rounded-lg"
-            >
-              <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
-                  <File class="w-5 h-5 text-gray-600" />
-                </div>
-                <div>
-                  <p class="font-medium">{{ file.name }}</p>
-                  <p class="text-sm text-gray-500">{{ formatFileSize(file.size) }}</p>
-                </div>
-              </div>
-
-              <div class="flex items-center space-x-2">
-                <button
-                  class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                  @click="downloadFile(file)"
-                >
-                  下载
-                </button>
-                <button
-                  class="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
-                  @click="deleteFile(file.id)"
-                  :disabled="deleteMutation.isPending.value"
-                >
-                  删除
-                </button>
-              </div>
+          <n-spin :show="isLoading">
+            <div v-if="error" class="py-4">
+              <n-alert type="error" title="加载失败">
+                {{ error }}
+              </n-alert>
             </div>
-          </div>
 
-          <div v-else class="text-gray-500 py-4 text-center">暂无上传的文件</div>
-        </div>
+            <div v-else-if="uploadedFiles && uploadedFiles.length > 0">
+              <n-list>
+                <n-list-item v-for="file in uploadedFiles" :key="file.id">
+                  <n-thing>
+                    <template #header>
+                      <div class="flex items-center gap-2">
+                        <n-icon size="20">
+                          <File />
+                        </n-icon>
+                        {{ file.name }}
+                      </div>
+                    </template>
+                    <template #description>
+                      <n-text depth="3">{{ formatFileSize(file.size) }}</n-text>
+                    </template>
+                    <template #footer>
+                      <n-space>
+                        <n-button size="small" @click="downloadFile(file)"> 下载 </n-button>
+                        <n-button
+                          size="small"
+                          type="error"
+                          :loading="deleteMutation.isPending.value"
+                          @click="deleteFile(file.id)"
+                        >
+                          删除
+                        </n-button>
+                      </n-space>
+                    </template>
+                  </n-thing>
+                </n-list-item>
+              </n-list>
+            </div>
+
+            <n-empty v-else description="暂无上传的文件" />
+          </n-spin>
+        </n-card>
 
         <!-- 分页示例 -->
-        <div v-if="uploadedFiles && uploadedFiles.length > 0">
-          <div class="flex items-center justify-between">
-            <div class="text-sm text-gray-600">
+        <n-card v-if="uploadedFiles && uploadedFiles.length > 0">
+          <n-space justify="space-between" align="center">
+            <n-text depth="3">
               显示 {{ (currentPage - 1) * pageSize + 1 }} -
               {{ Math.min(currentPage * pageSize, totalCount) }}
               共 {{ totalCount }} 个文件
-            </div>
+            </n-text>
 
-            <div class="flex items-center space-x-2">
-              <button
-                class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-                @click="prevPage"
-                :disabled="currentPage <= 1"
-              >
-                上一页
-              </button>
-
-              <span class="text-sm">第 {{ currentPage }} 页，共 {{ totalPages }} 页</span>
-
-              <button
-                class="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-                @click="nextPage"
-                :disabled="currentPage >= totalPages"
-              >
-                下一页
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            <n-pagination
+              v-model:page="currentPage"
+              :page-count="totalPages"
+              :page-size="pageSize"
+              show-size-picker
+              :page-sizes="[10, 20, 50]"
+              @update:page-size="handlePageSizeChange"
+            />
+          </n-space>
+        </n-card>
+      </n-space>
+    </n-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { LoadingSpinner } from '@/components/ui/loading'
 import { File, UploadCloud } from 'lucide-vue-next'
 import {
   useSupabaseList,
@@ -141,16 +131,19 @@ import {
   useSupabasePaginatedQuery,
 } from '@/lib/vue-query'
 import { useFileUpload } from '@/composables/useFileUpload'
-import { useNotification } from '@/composables/useNotification'
+import { useMessage, useDialog } from 'naive-ui'
+import type { UploadFileInfo, UploadCustomRequestOptions } from 'naive-ui'
 
 // 文件上传相关
-const fileInput = ref<HTMLInputElement>()
-const selectedFiles = ref<File[]>([])
+const uploadRef = ref()
+const fileList = ref<UploadFileInfo[]>([])
+
+const message = useMessage()
+const dialog = useDialog()
 
 // 使用现有的文件上传 composable
 const {
   uploadFile,
-  uploadMultipleFiles,
   deleteFile: deleteFileFromStorage,
   isUploading,
   uploadProgress,
@@ -158,7 +151,7 @@ const {
 } = useFileUpload()
 
 // 使用 Vue Query 获取文件列表
-const { data: uploadedFiles, isLoading, error } = useSupabaseList('files')
+const { data: uploadedFiles, isLoading, error, refetch } = useSupabaseList('files')
 
 // 使用分页查询
 const {
@@ -173,66 +166,71 @@ const {
 // 计算属性
 const totalCount = computed(() => paginatedData.value?.pagination.total || 0)
 const totalPages = computed(() => paginatedData.value?.pagination.totalPages || 0)
-const pageSize = 10
+const pageSize = ref(10)
 
 // 使用 Vue Query 创建文件记录
 const createMutation = useSupabaseCreate('files', {
   onSuccess: (data) => {
     console.log('文件记录创建成功:', data)
+    refetch()
   },
 })
 
 // 使用 Vue Query 删除文件
 const deleteMutation = useSupabaseDelete('files', {
   onSuccess: () => {
-    showSuccess('删除成功', '文件已成功删除')
+    message.success('文件已成功删除')
+    refetch()
   },
 })
 
-const { success: showSuccess, error: showError } = useNotification()
-
 // 方法
-const triggerFileSelect = () => {
-  fileInput.value?.click()
-}
-
-const handleFileSelect = async (event: Event) => {
-  const files = (event.target as HTMLInputElement).files
-  if (!files || files.length === 0) return
-
-  selectedFiles.value = Array.from(files)
-
-  // 使用现有的文件上传 composable 上传文件
+const handleUpload = async ({
+  file,
+  onFinish,
+  onError,
+  onProgress,
+}: UploadCustomRequestOptions) => {
   try {
-    for (const file of selectedFiles.value) {
-      const result = await uploadFile(file, {
-        category: 'image', // 自动检测或指定类型
-      })
+    const fileObj = file.file as File
+    const result = await uploadFile(fileObj, {
+      category: 'image',
+    })
 
-      if (result.error) {
-        throw new Error(result.error)
-      }
-
-      // 创建文件记录
-      createMutation.mutate({
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        url: result.data?.fullPath || '',
-        uploaded_at: new Date().toISOString(),
-      })
+    if (result.error) {
+      throw new Error(result.error)
     }
 
-    showSuccess('上传成功', `成功上传 ${selectedFiles.value.length} 个文件`)
+    // 创建文件记录
+    createMutation.mutate({
+      name: fileObj.name,
+      size: fileObj.size,
+      type: fileObj.type,
+      url: result.data?.fullPath || '',
+      uploaded_at: new Date().toISOString(),
+    })
+
+    onFinish()
+    message.success(`${fileObj.name} 上传成功`)
   } catch (error) {
     console.error('文件上传失败:', error)
-    showError('上传失败', error instanceof Error ? error.message : '文件上传失败')
+    onError()
+    message.error(error instanceof Error ? error.message : '文件上传失败')
   }
+}
 
-  // 清空文件输入
-  if (fileInput.value) {
-    fileInput.value.value = ''
-  }
+const handleFileChange = (options: { file: UploadFileInfo; fileList: UploadFileInfo[] }) => {
+  fileList.value = options.fileList
+}
+
+const handleFileRemove = (options: { file: UploadFileInfo; fileList: UploadFileInfo[] }) => {
+  fileList.value = options.fileList
+}
+
+const handlePageSizeChange = (size: number) => {
+  pageSize.value = size
+  // 重新获取数据以应用新的页面大小
+  refetch()
 }
 
 const formatFileSize = (bytes: number): string => {
@@ -252,14 +250,20 @@ const downloadFile = (file: any) => {
 }
 
 const deleteFile = (fileId: string) => {
-  if (confirm('确定要删除这个文件吗？')) {
-    deleteMutation.mutate(fileId)
-  }
+  dialog.warning({
+    title: '确认删除',
+    content: '确定要删除这个文件吗？',
+    positiveText: '确定',
+    negativeText: '取消',
+    onPositiveClick: () => {
+      deleteMutation.mutate(fileId)
+    },
+  })
 }
 </script>
 
 <style scoped>
 .upload-example {
-  max-width: 800px;
+  max-width: 1200px;
 }
 </style>

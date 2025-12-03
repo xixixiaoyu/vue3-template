@@ -6,12 +6,12 @@ import type { OAuthProvider } from '@/types/database.types'
 interface Props {
   redirectPath?: string
   showDivider?: boolean
-  size?: 'sm' | 'default' | 'lg'
+  size?: 'small' | 'medium' | 'large'
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showDivider: true,
-  size: 'default',
+  size: 'medium',
 })
 
 const authStore = useAuthStore()
@@ -63,47 +63,40 @@ const handleOAuthLogin = async (provider: OAuthProvider) => {
     console.error('OAuth 登录失败:', result.error)
   }
 }
-
-const buttonSizeClass = computed(() => {
-  switch (props.size) {
-    case 'sm':
-      return 'h-8 text-sm'
-    case 'lg':
-      return 'h-12 text-base'
-    default:
-      return 'h-10 text-sm'
-  }
-})
 </script>
 
 <template>
   <div class="w-full space-y-3">
     <!-- OAuth 按钮 -->
-    <div class="grid grid-cols-2 gap-2">
-      <button
-        v-for="provider in oauthProviders"
-        :key="provider.provider"
-        :disabled="isLoading"
-        :class="`w-full ${buttonSizeClass} flex items-center justify-start gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50`"
-        @click="handleOAuthLogin(provider.provider)"
-      >
-        <svg :class="`h-4 w-4`" viewBox="0 0 24 24" fill="currentColor">
-          <path :d="provider.icon" />
-        </svg>
-        <span class="truncate">{{ provider.name }}</span>
-      </button>
-    </div>
+    <n-grid :cols="2" :x-gap="8" :y-gap="8">
+      <n-grid-item v-for="provider in oauthProviders" :key="provider.provider">
+        <n-button
+          :size="size"
+          :loading="isLoading"
+          block
+          @click="handleOAuthLogin(provider.provider)"
+          class="oauth-button"
+        >
+          <template #icon>
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+              <path :d="provider.icon" />
+            </svg>
+          </template>
+          {{ provider.name }}
+        </n-button>
+      </n-grid-item>
+    </n-grid>
 
     <!-- 分割线 -->
-    <div v-if="showDivider" class="relative">
-      <div class="absolute inset-0 flex items-center">
-        <span class="w-full border-t border-gray-300 dark:border-gray-600" />
-      </div>
-      <div class="relative flex justify-center text-xs uppercase">
-        <span class="bg-white dark:bg-gray-800 px-2 text-gray-500 dark:text-gray-400"
-          >或使用邮箱</span
-        >
-      </div>
-    </div>
+    <n-divider v-if="showDivider"> 或使用邮箱 </n-divider>
   </div>
 </template>
+
+<style scoped>
+.oauth-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+</style>

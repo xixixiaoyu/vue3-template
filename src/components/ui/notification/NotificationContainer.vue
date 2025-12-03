@@ -10,20 +10,22 @@ const handleClose = (id: string) => {
 </script>
 
 <template>
-  <div
-    v-if="notifications.length > 0"
-    class="fixed top-4 right-4 z-50 w-96 max-w-sm"
-    aria-live="assertive"
-  >
-    <TransitionGroup name="notification" tag="div" class="space-y-2">
-      <Notification
-        v-for="notification in notifications"
-        :key="notification.id"
-        :notification="notification"
-        @close="handleClose"
-      />
-    </TransitionGroup>
-  </div>
+  <n-notification-provider>
+    <div
+      v-if="notifications.length > 0"
+      class="fixed top-4 right-4 z-50 w-96 max-w-sm"
+      aria-live="assertive"
+    >
+      <TransitionGroup name="notification" tag="div" class="space-y-2">
+        <Notification
+          v-for="notification in notifications"
+          :key="notification.id"
+          :notification="notification"
+          @close="handleClose"
+        />
+      </TransitionGroup>
+    </div>
+  </n-notification-provider>
 </template>
 
 <style scoped>

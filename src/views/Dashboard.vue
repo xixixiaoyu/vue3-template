@@ -1,121 +1,118 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <n-layout class="min-h-screen">
     <!-- 顶部导航栏 -->
-    <header
-      class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm"
-    >
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex items-center">
-            <Home class="h-8 w-8 text-blue-600" />
-            <h1 class="ml-3 text-xl font-semibold text-gray-900 dark:text-white">
-              {{ t('navigation.dashboard') }}
-            </h1>
-          </div>
+    <n-layout-header bordered class="h-16 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-7xl mx-auto h-full flex justify-between items-center">
+        <div class="flex items-center">
+          <n-icon size="32" color="#2563eb">
+            <Home />
+          </n-icon>
+          <h1 class="ml-3 text-xl font-semibold">
+            {{ t('navigation.dashboard') }}
+          </h1>
+        </div>
 
-          <div class="flex items-center space-x-4">
-            <!-- 用户信息 -->
-            <div class="flex items-center space-x-3">
-              <div class="flex-shrink-0">
-                <div
-                  class="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center"
-                >
-                  <User class="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </div>
-              </div>
+        <div class="flex items-center space-x-4">
+          <!-- 用户信息 -->
+          <n-dropdown trigger="hover" :options="userMenuOptions">
+            <div class="flex items-center space-x-3 cursor-pointer">
+              <n-avatar
+                round
+                size="small"
+                :fallback-style="{ backgroundColor: '#2563eb', color: 'white' }"
+              >
+                <n-icon size="16">
+                  <User />
+                </n-icon>
+              </n-avatar>
               <div class="hidden md:block">
-                <div class="text-sm font-medium text-gray-900 dark:text-white">{{ userName }}</div>
-                <div class="text-xs text-gray-500 dark:text-gray-400">{{ userEmail }}</div>
+                <div class="text-sm font-medium">{{ userName }}</div>
+                <div class="text-xs opacity-70">{{ userEmail }}</div>
               </div>
             </div>
+          </n-dropdown>
 
-            <!-- 退出登录按钮 -->
-            <button
-              @click="handleSignOut"
-              :disabled="authStore.loading"
-              class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              <LogOut class="h-4 w-4 mr-1" />
-              {{ t('auth.logout') }}
-            </button>
-          </div>
+          <!-- 退出登录按钮 -->
+          <n-button @click="handleSignOut" :loading="authStore.loading" type="primary" size="small">
+            <template #icon>
+              <n-icon>
+                <LogOut />
+              </n-icon>
+            </template>
+            {{ t('auth.logout') }}
+          </n-button>
         </div>
       </div>
-    </header>
+    </n-layout-header>
 
     <!-- 主要内容区域 -->
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <n-layout-content class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <!-- 欢迎信息 -->
-      <div class="px-4 py-6 sm:px-0">
-        <div class="border-4 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8">
-          <div class="text-center">
-            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              {{ t('dashboard.welcome') }}，{{ userName }}！
-            </h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-6">
-              {{
-                t('dashboard.description') ||
-                '这是您的个人仪表板，您可以在这里管理您的账户和查看相关信息。'
-              }}
-            </p>
+      <n-card class="mb-6">
+        <div class="text-center">
+          <n-h2 class="mb-4"> {{ t('dashboard.welcome') }}，{{ userName }}！ </n-h2>
+          <n-p class="mb-6">
+            {{
+              t('dashboard.description') ||
+              '这是您的个人仪表板，您可以在这里管理您的账户和查看相关信息。'
+            }}
+          </n-p>
 
-            <!-- 快速操作卡片 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6"
-              >
-                <div class="mb-4">
-                  <h3
-                    class="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white"
-                  >
-                    <Globe class="h-5 w-5" />
+          <!-- 快速操作卡片 -->
+          <n-grid :cols="1" :x-gap="16" :y-gap="16" responsive="screen">
+            <n-grid-item :span="1" s:2 m:2 l:1>
+              <n-card hoverable>
+                <template #header>
+                  <div class="flex items-center gap-2">
+                    <n-icon size="20">
+                      <Globe />
+                    </n-icon>
                     {{ t('navigation.settings') }}
-                  </h3>
-                </div>
-                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  </div>
+                </template>
+                <n-p depth="3">
                   {{ t('dashboard.description') || '主仪表板页面' }}
-                </p>
-              </div>
+                </n-p>
+              </n-card>
+            </n-grid-item>
 
-              <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6"
-              >
-                <div class="mb-4">
-                  <h3
-                    class="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white"
-                  >
-                    <Package class="h-5 w-5" />
+            <n-grid-item :span="1" s:2 m:2 l:1>
+              <n-card hoverable>
+                <template #header>
+                  <div class="flex items-center gap-2">
+                    <n-icon size="20">
+                      <Package />
+                    </n-icon>
                     新功能
-                  </h3>
-                </div>
-                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  查看所有新增的功能和组件
-                </p>
-                <button
-                  @click="goToFeatures"
-                  class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-                >
+                  </div>
+                </template>
+                <n-p depth="3" class="mb-4"> 查看所有新增的功能和组件 </n-p>
+                <n-button @click="goToFeatures" type="primary" block>
                   {{ t('common.view') }}
-                </button>
-              </div>
-            </div>
-          </div>
+                </n-button>
+              </n-card>
+            </n-grid-item>
+          </n-grid>
         </div>
-      </div>
-    </main>
-  </div>
+      </n-card>
+    </n-layout-content>
+  </n-layout>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { User, LogOut, Home, Package } from 'lucide-vue-next'
+import { User, LogOut, Home, Package, Settings, UserCircle } from 'lucide-vue-next'
 import { useLocale } from '@/composables/useI18n'
+import { useMessage, useDialog } from 'naive-ui'
+import type { DropdownOption } from 'naive-ui'
 
 const { t } = useLocale()
 const router = useRouter()
 const authStore = useAuthStore()
+const message = useMessage()
+const dialog = useDialog()
 
 // 计算属性
 const userEmail = computed(() => authStore.user?.email || '')
@@ -131,15 +128,61 @@ const userName = computed(() => {
   return userEmail.value.split('@')[0]
 })
 
-// 退出登录
-const handleSignOut = async () => {
-  const result = await authStore.signOut()
-  if (result.success) {
-    // 退出成功，重定向到登录页
-    router.push({ name: 'login' })
-  } else {
-    console.error('退出登录失败:', result.error)
+// 用户菜单选项
+const userMenuOptions = computed<DropdownOption[]>(() => [
+  {
+    label: '个人资料',
+    key: 'profile',
+    icon: () => h('div', { class: 'flex items-center' }, [h(UserCircle, { size: 16 })]),
+  },
+  {
+    label: '设置',
+    key: 'settings',
+    icon: () => h('div', { class: 'flex items-center' }, [h(Settings, { size: 16 })]),
+  },
+  {
+    type: 'divider',
+  },
+  {
+    label: '退出登录',
+    key: 'logout',
+    icon: () => h('div', { class: 'flex items-center' }, [h(LogOut, { size: 16 })]),
+  },
+])
+
+// 处理用户菜单选择
+const handleUserMenuSelect = (key: string) => {
+  switch (key) {
+    case 'profile':
+      message.info('个人资料功能开发中')
+      break
+    case 'settings':
+      message.info('设置功能开发中')
+      break
+    case 'logout':
+      handleSignOut()
+      break
   }
+}
+
+// 退出登录
+const handleSignOut = () => {
+  dialog.warning({
+    title: '确认退出',
+    content: '您确定要退出登录吗？',
+    positiveText: '确定',
+    negativeText: '取消',
+    onPositiveClick: async () => {
+      const result = await authStore.signOut()
+      if (result.success) {
+        message.success('退出登录成功')
+        // 退出成功，重定向到登录页
+        router.push({ name: 'login' })
+      } else {
+        message.error('退出登录失败: ' + (result.error || '未知错误'))
+      }
+    },
+  })
 }
 
 // 跳转到功能页面

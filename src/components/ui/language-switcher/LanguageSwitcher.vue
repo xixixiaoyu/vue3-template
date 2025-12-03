@@ -1,38 +1,34 @@
 <template>
-  <div class="language-switcher relative">
-    <button
-      @click="toggleDropdown"
-      class="language-trigger flex items-center gap-2 px-3 py-1.5 text-sm rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-    >
-      <Globe class="h-4 w-4" />
+  <n-dropdown
+    :options="languageOptions"
+    :value="currentLocale"
+    @select="handleLanguageSelect"
+    placement="bottom-end"
+    trigger="click"
+  >
+    <n-button text>
+      <template #icon>
+        <n-icon>
+          <Globe />
+        </n-icon>
+      </template>
       {{ currentLanguage }}
-      <ChevronDown class="h-4 w-4" />
-    </button>
-    <div
-      v-if="isOpen"
-      class="absolute right-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50"
-    >
-      <div
-        v-for="lang in languages"
-        :key="lang.code"
-        @click="switchLanguage(lang.code)"
-        class="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
-        :class="{ 'bg-gray-100 dark:bg-gray-700': isCurrentLanguage(lang.code) }"
-      >
-        <span>{{ lang.flag }}</span>
-        {{ lang.name }}
-      </div>
-    </div>
-  </div>
+      <template #suffix>
+        <n-icon>
+          <ChevronDown />
+        </n-icon>
+      </template>
+    </n-button>
+  </n-dropdown>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, h } from 'vue'
 import { Globe, ChevronDown } from 'lucide-vue-next'
 import { useLocale } from '@/composables/useI18n'
+import type { DropdownOption } from 'naive-ui'
 
 const { currentLocale, setLocale } = useLocale()
-const isOpen = ref(false)
 
 const languages = [
   { code: 'zh', name: '简体中文', flag: '🇨🇳' },
@@ -44,30 +40,16 @@ const currentLanguage = computed(() => {
   return lang?.name || 'Language'
 })
 
-const isCurrentLanguage = (code: string) => {
-  return currentLocale.value === code
-}
+const languageOptions = computed<DropdownOption[]>(() =>
+  languages.map((lang) => ({
+    label: () =>
+      h('div', { class: 'flex items-center gap-2' }, [h('span', lang.flag), h('span', lang.name)]),
+    key: lang.code,
+    value: lang.code,
+  }))
+)
 
-const switchLanguage = (code: string) => {
-  setLocale(code)
-  isOpen.value = false
+const handleLanguageSelect = (key: string) => {
+  setLocale(key)
 }
-
-const toggleDropdown = () => {
-  isOpen.value = !isOpen.value
-}
-
-// 点击外部关闭下拉菜单
-document.addEventListener('click', (e) => {
-  const target = e.target as HTMLElement
-  if (!target.closest('.language-switcher')) {
-    isOpen.value = false
-  }
-})
 </script>
-
-<style scoped>
-.language-switcher {
-  display: inline-block;
-}
-</style>

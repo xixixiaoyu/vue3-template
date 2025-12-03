@@ -1,36 +1,40 @@
 <template>
   <div v-if="showInstallPrompt" class="pwa-install-prompt">
-    <Card class="install-card">
-      <CardContent class="p-4">
-        <div class="flex items-center gap-3">
-          <div class="install-icon">
-            <Download class="h-6 w-6" />
-          </div>
-          <div class="flex-1">
-            <h3 class="font-medium text-sm">{{ t('pwa.installTitle') }}</h3>
-            <p class="text-xs text-muted-foreground mt-1">
-              {{ t('pwa.installDescription') }}
-            </p>
-          </div>
-          <div class="flex gap-2">
-            <Button variant="outline" size="sm" @click="dismissPrompt">
-              {{ t('common.cancel') }}
-            </Button>
-            <Button size="sm" @click="installPWA">
-              {{ t('pwa.install') }}
-            </Button>
-          </div>
+    <div
+      class="install-card bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4"
+    >
+      <div class="flex items-center gap-3">
+        <div class="install-icon">
+          <Download class="h-6 w-6" />
         </div>
-      </CardContent>
-    </Card>
+        <div class="flex-1">
+          <h3 class="font-medium text-sm">{{ t('pwa.installTitle') }}</h3>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            {{ t('pwa.installDescription') }}
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <button
+            @click="dismissPrompt"
+            class="px-3 py-1.5 text-xs border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+          >
+            {{ t('common.cancel') }}
+          </button>
+          <button
+            @click="installPWA"
+            class="px-3 py-1.5 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          >
+            {{ t('pwa.install') }}
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { Download } from 'lucide-vue-next'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { useLocale } from '@/composables/useI18n'
 
 const { t } = useLocale()
@@ -94,8 +98,8 @@ onMounted(() => {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.5rem;
-  background-color: hsl(var(--primary) / 0.1);
-  color: hsl(var(--primary));
+  background-color: rgba(59, 130, 246, 0.1);
+  color: rgb(59, 130, 246);
 }
 
 @media (min-width: 640px) {

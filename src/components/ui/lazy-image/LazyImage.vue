@@ -13,11 +13,11 @@
     />
     <div
       v-if="!imageLoaded"
-      class="absolute inset-0 flex items-center justify-center bg-muted rounded-inherit"
+      class="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-inherit"
     >
       <div class="flex flex-col items-center gap-2">
         <LoadingSpinner v-if="showLoadingSpinner" size="sm" />
-        <span v-if="placeholderText" class="text-sm text-muted-foreground">{{
+        <span v-if="placeholderText" class="text-sm text-gray-500 dark:text-gray-400">{{
           placeholderText
         }}</span>
       </div>

@@ -63,9 +63,9 @@ const { fields, isSubmitting, serverError, handleSubmit } = useFormValidation({
     if (result.success) {
       // 注册成功，显示成功消息
       showSuccessMessage()
-      // 延迟重定向到仪表板
+      // 延迟重定向到登录页
       setTimeout(() => {
-        router.push({ name: 'dashboard' })
+        router.push({ name: 'login' })
       }, 2000)
     } else {
       // 注册失败，抛出错误让 composable 处理

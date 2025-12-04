@@ -50,8 +50,8 @@ const { fields, isSubmitting, serverError, handleSubmit } = useFormValidation({
         savedEmail.value = ''
       }
 
-      // 登录成功，重定向到仪表板
-      router.push({ name: 'dashboard' })
+      // 登录成功，重定向到登录页
+      router.push({ name: 'login' })
     } else {
       // 登录失败，抛出错误让 composable 处理
       throw new Error(result.error || '登录失败，请重试')

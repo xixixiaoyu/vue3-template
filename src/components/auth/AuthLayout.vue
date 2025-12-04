@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<Props>(), {
   showFooter: true,
 })
 
-const { t, currentLocale } = useLocale()
+const { t, currentLocale, setLocale } = useLocale()
 const { isDark, toggleTheme } = useTheme()
 const { success } = useNotification()
 
@@ -53,6 +53,7 @@ const logoClasses = computed(() => [
 
 const handleLanguageChange = (newLocale: string) => {
   showLanguageSwitcher.value = false
+  setLocale(newLocale)
   success('语言已切换', `已切换到 ${newLocale === 'zh' ? '中文' : 'English'}`)
 }
 

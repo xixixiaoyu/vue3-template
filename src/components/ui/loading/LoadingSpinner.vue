@@ -4,7 +4,7 @@ interface Props {
   stroke?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   size: 'medium',
 })
 </script>

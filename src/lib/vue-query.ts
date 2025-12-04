@@ -6,8 +6,7 @@ import {
   type UseMutationOptions,
 } from '@tanstack/vue-query'
 import { supabase } from './supabase'
-import type { Database } from '@/types/database.types'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
 // 通用查询选项
 export const defaultQueryOptions = {

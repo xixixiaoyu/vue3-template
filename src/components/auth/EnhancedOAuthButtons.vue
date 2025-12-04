@@ -268,11 +268,4 @@ const getIconSize = () => {
 .animate-spin {
   animation: spin 1s linear infinite;
 }
-
-/* 深色模式优化 */
-@media (prefers-color-scheme: dark) {
-  .oauth-divider__text {
-    @apply bg-gray-900;
-  }
-}
 </style>

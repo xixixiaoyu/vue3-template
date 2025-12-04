@@ -642,11 +642,4 @@ setTimeout(() => {
     @apply py-3 text-base;
   }
 }
-
-/* 深色模式优化 */
-@media (prefers-color-scheme: dark) {
-  .form-input {
-    @apply bg-gray-800 text-white;
-  }
-}
 </style>

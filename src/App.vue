@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import { setupGlobalErrorHandler } from '@/composables/useErrorHandler'
 import { useGlobalLoading } from '@/composables/useLoading'
 import { useLocale } from '@/composables/useI18n'
-import { useLocalStorageBoolean } from '@/composables/useLocalStorage'
+import { useTheme } from '@/composables/useTheme'
 import { RouterView } from 'vue-router'
 import { NotificationContainer } from '@/components/ui/notification'
 import { LoadingOverlay } from '@/components/ui/loading'
@@ -23,70 +23,17 @@ import {
 const authStore = useAuthStore()
 const { isLoading } = useGlobalLoading()
 const { currentLocale: locale } = useLocale()
-
-// 主题状态管理
-const { value: isDarkMode } = useLocalStorageBoolean('darkMode', false)
+const { isDark, toggleTheme } = useTheme()
 
 // 计算主题
 const theme = computed<GlobalTheme | null>(() => {
-  // 优先使用用户设置的主题
-  if (isDarkMode.value !== null) {
-    return isDarkMode.value ? darkTheme : null
-  }
-
-  // 如果没有用户设置，检查系统偏好
-  if (typeof window !== 'undefined') {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-    return prefersDark ? darkTheme : null
-  }
-
-  return null
+  return isDark.value ? darkTheme : null
 })
 
 // 根据当前语言设置 Naive UI 的语言包
 const naiveLocale = computed(() => {
   return locale.value === 'zh' ? zhCN : enUS
 })
-
-// 切换主题的方法
-const toggleTheme = () => {
-  isDarkMode.value = !isDarkMode.value
-}
-
-// 监听系统主题变化
-const setupSystemThemeListener = () => {
-  if (typeof window !== 'undefined') {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-
-    const handleChange = () => {
-      // 只有在用户没有手动设置主题时才跟随系统
-      // 注意：isDarkMode.value 总是布尔值，所以这里我们不需要检查 null
-      // 如果需要实现"跟随系统"功能，需要修改 useLocalStorageBoolean 的实现
-    }
-
-    // 添加监听器
-    if (mediaQuery.addEventListener) {
-      mediaQuery.addEventListener('change', handleChange)
-    } else {
-      // 兼容旧版浏览器
-      mediaQuery.addListener(handleChange)
-    }
-
-    // 返回清理函数
-    return () => {
-      if (mediaQuery.removeEventListener) {
-        mediaQuery.removeEventListener('change', handleChange)
-      } else {
-        mediaQuery.removeListener(handleChange)
-      }
-    }
-  }
-
-  return () => {}
-}
-
-// 设置系统主题监听器
-const cleanupThemeListener = setupSystemThemeListener()
 
 // 在应用启动时初始化认证状态
 onMounted(async () => {
@@ -97,7 +44,6 @@ onMounted(async () => {
 
 // 在组件卸载时清理资源
 onUnmounted(() => {
-  cleanupThemeListener()
   // 这里可以添加其他清理逻辑
 })
 

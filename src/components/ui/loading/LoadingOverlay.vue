@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { NModal, NSpin, NText } from 'naive-ui'
+
 interface Props {
   show?: boolean
   message?: string

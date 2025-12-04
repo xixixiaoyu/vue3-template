@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import type { OAuthProvider } from '@/types/database.types'
+import { NButton, NGrid, NGridItem, NDivider } from 'naive-ui'
 
 interface Props {
   redirectPath?: string

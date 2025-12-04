@@ -195,11 +195,16 @@ export const useAuthStore = defineStore(
 
         // 更新 profiles 表
         if (user.value) {
-          const { error: profileError } = await (supabase as any).from('profiles').upsert({
+          const profileData = {
             id: user.value.id,
             ...updates,
             updated_at: new Date().toISOString(),
-          })
+          }
+
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .upsert(profileData as any)
+            .select()
 
           if (profileError) throw profileError
         }

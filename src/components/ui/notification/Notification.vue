@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Notification as NotificationType } from '@/types'
+import { NAlert } from 'naive-ui'
 
 // 添加组件名称以满足多词组件命名规则
 defineOptions({

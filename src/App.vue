@@ -22,7 +22,7 @@ import {
 
 const authStore = useAuthStore()
 const { isLoading } = useGlobalLoading()
-const { currentLocale: locale, t } = useLocale()
+const { currentLocale: locale } = useLocale()
 
 // 主题状态管理
 const { value: isDarkMode } = useLocalStorageBoolean('darkMode', false)
@@ -58,11 +58,10 @@ const setupSystemThemeListener = () => {
   if (typeof window !== 'undefined') {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
-    const handleChange = (e: MediaQueryListEvent) => {
+    const handleChange = () => {
       // 只有在用户没有手动设置主题时才跟随系统
-      if (isDarkMode.value === null) {
-        isDarkMode.value = e.matches
-      }
+      // 注意：isDarkMode.value 总是布尔值，所以这里我们不需要检查 null
+      // 如果需要实现"跟随系统"功能，需要修改 useLocalStorageBoolean 的实现
     }
 
     // 添加监听器

@@ -51,8 +51,9 @@ router.beforeEach(async (to, from, next) => {
   }
   // 检查是否需要游客状态（已登录用户不应访问登录/注册页）
   else if (to.meta.requiresGuest && authStore.isAuthenticated) {
-    // 需要游客状态但用户已登录，重定向到登录页（因为没有仪表板了）
-    return next({ name: 'login' })
+    // 需要游客状态但用户已登录，重定向到主页
+    // 注意：当前项目中没有仪表板，所以重定向到主页
+    return next({ name: 'home' })
   } else {
     // 允许访问
     next()

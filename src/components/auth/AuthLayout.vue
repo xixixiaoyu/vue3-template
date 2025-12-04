@@ -4,6 +4,7 @@ import { useLocale } from '@/composables/useI18n'
 import { useTheme } from '@/composables/useTheme'
 import { useNotification } from '@/composables/useNotification'
 import { Moon, Sun, Languages, Shield } from 'lucide-vue-next'
+import { NButton, NIcon } from 'naive-ui'
 
 interface Props {
   title: string

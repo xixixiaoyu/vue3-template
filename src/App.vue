@@ -22,7 +22,7 @@ import {
 
 const authStore = useAuthStore()
 const { isLoading } = useGlobalLoading()
-const { currentLocale: locale } = useLocale()
+const { currentLocale: locale, t } = useLocale()
 
 // 主题状态管理
 const { value: isDarkMode } = useLocalStorageBoolean('darkMode', false)

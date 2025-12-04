@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const authStore = useAuthStore()
 const { error, info } = useNotification()
-const [, setParentRef] = useAutoAnimate()
+const [parentRef] = useAutoAnimate()
 
 const loadingProvider = ref<OAuthProvider | null>(null)
 
@@ -122,7 +122,7 @@ const getIconSize = () => {
 </script>
 
 <template>
-  <div ref="setParentRef" class="oauth-container">
+  <div ref="parentRef" class="oauth-container">
     <!-- OAuth 按钮 -->
     <div v-if="layout === 'grid'" class="oauth-grid" :class="`oauth-grid--${size}`">
       <button

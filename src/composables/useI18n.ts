@@ -1,20 +1,32 @@
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, type ComputedRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLocalStorageString } from './useLocalStorage'
+
+interface LocaleReturn {
+  currentLocale: ComputedRef<string>
+  t: (key: string, ...args: any[]) => string
+  availableLocales: readonly string[]
+  toggleLocale: () => void
+  setLocale: (lang: string) => void
+  isCurrentLocale: (lang: string) => boolean
+  detectUserLanguage: () => string
+}
 
 /**
  * 国际化 Hook
  * 提供语言切换、翻译和自动语言检测功能
  */
-export function useLocale() {
+export const useLocale = (): LocaleReturn => {
   const { locale, t, availableLocales } = useI18n()
   const { setValue: setStoredLocale } = useLocalStorageString('locale', 'zh')
 
   const currentLocale = computed({
     get: () => locale.value,
     set: (value: string) => {
-      locale.value = value
-      setStoredLocale(value)
+      if (availableLocales.includes(value)) {
+        locale.value = value
+        setStoredLocale(value)
+      }
     },
   })
 
@@ -62,6 +74,11 @@ export function useLocale() {
       if (detectedLocale && availableLocales.includes(detectedLocale)) {
         currentLocale.value = detectedLocale
         setStoredLocale(detectedLocale)
+      }
+    } else {
+      // 确保当前语言与保存的语言一致
+      if (locale.value !== savedLocale && availableLocales.includes(savedLocale)) {
+        locale.value = savedLocale
       }
     }
   })

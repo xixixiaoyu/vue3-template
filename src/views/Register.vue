@@ -53,7 +53,7 @@ const registerSchema = z
   })
 
 // 使用增强表单验证
-const { fields, isSubmitting, serverError, handleSubmit, setParentRef, isValid, clearAllErrors } =
+const { fields, isSubmitting, serverError, handleSubmit, parentRef, isValid, clearAllErrors } =
   useEnhancedFormValidation({
     schema: registerSchema,
     initialValues: {
@@ -185,7 +185,7 @@ setTimeout(() => {
     :logo-icon="UserPlus"
     :footer-text="t('auth.registerTermsNotice')"
   >
-    <div ref="setParentRef" class="space-y-6">
+    <div ref="parentRef" class="space-y-6">
       <!-- 页面标题 -->
       <div class="text-center">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">

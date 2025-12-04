@@ -32,6 +32,11 @@ import {
   NIcon,
   NAvatar,
   NDropdown,
+  NSpin,
+  NText,
+  NModal,
+  NAlert,
+  NDivider,
 } from 'naive-ui'
 
 // 导入字体
@@ -94,6 +99,11 @@ const naive = create({
     NIcon,
     NAvatar,
     NDropdown,
+    NSpin,
+    NText,
+    NModal,
+    NAlert,
+    NDivider,
   ],
 })
 

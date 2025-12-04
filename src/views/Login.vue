@@ -42,7 +42,7 @@ const {
   isSubmitting,
   serverError,
   handleSubmit,
-  setParentRef,
+  parentRef,
   isValid,
   clearAllErrors,
   focusField,
@@ -145,7 +145,7 @@ setTimeout(() => {
     :logo-icon="LogIn"
     :footer-text="t('auth.termsNotice')"
   >
-    <div ref="setParentRef" class="space-y-6">
+    <div ref="parentRef" class="space-y-6">
       <!-- 页面标题 -->
       <div class="text-center">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">

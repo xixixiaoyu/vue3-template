@@ -76,7 +76,7 @@ onMounted(() => {
     </div>
 
     <!-- 主要内容 -->
-    <div class="relative z-10 w-full">
+    <div class="relative z-10 w-full flex flex-col items-center">
       <!-- 顶部工具栏 -->
       <div class="flex justify-between items-center mb-6 px-2">
         <!-- 主题切换按钮 -->

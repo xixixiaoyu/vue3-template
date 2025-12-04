@@ -1,0 +1,305 @@
+import { ref, reactive, computed, nextTick } from 'vue'
+import { useForm, useField } from 'vee-validate'
+import { z } from 'zod'
+import { toTypedSchema } from '@vee-validate/zod'
+import { useNotification } from './useNotification'
+import { useAutoAnimate } from './useAutoAnimate'
+
+interface UseEnhancedFormValidationOptions<T extends z.ZodObject<any>> {
+  schema: T
+  initialValues?: z.infer<T>
+  onSubmit: (values: z.infer<T>) => Promise<void> | void
+  onSuccess?: () => void
+  onError?: (error: Error) => void
+  validateOnChange?: boolean
+  validateOnBlur?: boolean
+}
+
+export function useEnhancedFormValidation<T extends z.ZodObject<any>>(
+  options: UseEnhancedFormValidationOptions<T>
+) {
+  const { success, error } = useNotification()
+  const [parentRef, setParentRef] = useAutoAnimate()
+
+  const form = useForm({
+    validationSchema: toTypedSchema(options.schema),
+    initialValues: options.initialValues || ({} as z.infer<T>),
+    validateOnMount: false,
+  })
+
+  const isSubmitting = ref(false)
+  const serverError = ref<string>('')
+  const isSubmitted = ref(false)
+
+  // 为每个字段创建 useField
+  const fields = reactive<
+    Record<
+      string,
+      {
+        value: any
+        errorMessage: string | undefined
+        meta: any
+        validate: () => Promise<any>
+        name: string
+        touched: boolean
+        dirty: boolean
+        valid: boolean
+        invalid: boolean
+      }
+    >
+  >({})
+
+  // 获取 schema 中的所有字段名
+  const fieldNames = Object.keys(options.schema.shape)
+
+  fieldNames.forEach((fieldName) => {
+    const { value, errorMessage, meta, validate } = useField(fieldName)
+    fields[fieldName] = reactive({
+      value,
+      errorMessage,
+      meta,
+      validate,
+      name: fieldName,
+      touched: computed(() => meta.touched),
+      dirty: computed(() => meta.dirty),
+      valid: computed(() => meta.valid),
+      invalid: computed(() => !meta.valid),
+    })
+  })
+
+  const handleSubmit = form.handleSubmit(async (values: z.infer<T>) => {
+    try {
+      isSubmitting.value = true
+      serverError.value = ''
+      isSubmitted.value = true
+
+      await options.onSubmit(values)
+
+      // 成功回调
+      if (options.onSuccess) {
+        options.onSuccess()
+      }
+
+      // 显示成功消息
+      success('操作成功', '表单提交成功')
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : '提交失败，请重试'
+      serverError.value = errorMessage
+
+      // 错误回调
+      if (options.onError) {
+        options.onError(err instanceof Error ? err : new Error(errorMessage))
+      }
+
+      // 显示错误消息
+      error('表单提交失败', errorMessage)
+
+      // 滚动到错误位置
+      await nextTick()
+      scrollToError()
+    } finally {
+      isSubmitting.value = false
+    }
+  })
+
+  // 滚动到第一个错误字段
+  const scrollToError = async () => {
+    const firstErrorField = document.querySelector('.n-form-item--error')
+    if (firstErrorField) {
+      firstErrorField.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      })
+    }
+  }
+
+  // 重置表单
+  const resetForm = () => {
+    form.resetForm()
+    serverError.value = ''
+    isSubmitted.value = false
+  }
+
+  // 设置字段值
+  const setFieldValue = (fieldName: string, value: any) => {
+    form.setFieldValue(fieldName, value)
+  }
+
+  // 设置多个字段值
+  const setFieldValues = (values: Partial<z.infer<T>>) => {
+    Object.entries(values).forEach(([field, value]) => {
+      form.setFieldValue(field, value)
+    })
+  }
+
+  // 设置错误
+  const setErrors = (errors: Record<string, string>) => {
+    Object.entries(errors).forEach(([field, message]) => {
+      form.setFieldError(field, message)
+    })
+  }
+
+  // 验证所有字段
+  const validateAll = async () => {
+    const result = await form.validate()
+    return result.valid
+  }
+
+  // 验证单个字段
+  const validateField = async (fieldName: string) => {
+    if (fields[fieldName]) {
+      return await fields[fieldName].validate()
+    }
+    return { valid: false }
+  }
+
+  // 获取字段错误信息
+  const getFieldError = (fieldName: string) => {
+    return fields[fieldName]?.errorMessage
+  }
+
+  // 检查字段是否有错误
+  const hasFieldError = (fieldName: string) => {
+    return !!getFieldError(fieldName)
+  }
+
+  // 检查表单是否有任何错误
+  const hasErrors = computed(() => {
+    return Object.values(fields).some((field) => field.invalid) || !!serverError.value
+  })
+
+  // 表单有效性
+  const isValid = computed(() => form.meta.value.valid && !hasErrors.value)
+
+  // 表单是否被修改过
+  const isDirty = computed(() => form.meta.value.dirty)
+
+  // 获取所有表单值
+  const getValues = () => {
+    return form.values as z.infer<T>
+  }
+
+  // 获取特定字段值
+  const getFieldValue = (fieldName: string) => {
+    return fields[fieldName]?.value
+  }
+
+  // 聚焦到指定字段
+  const focusField = (fieldName: string) => {
+    const input = document.querySelector(`[name="${fieldName}"]`) as HTMLInputElement
+    if (input) {
+      input.focus()
+      input.select()
+    }
+  }
+
+  // 清除特定字段错误
+  const clearFieldError = (fieldName: string) => {
+    form.setFieldError(fieldName, undefined)
+  }
+
+  // 清除所有错误
+  const clearAllErrors = () => {
+    Object.keys(fields).forEach((fieldName) => {
+      form.setFieldError(fieldName, undefined)
+    })
+    serverError.value = ''
+  }
+
+  return {
+    // 动画引用
+    parentRef,
+    setParentRef,
+
+    // 表单状态
+    values: form.values as z.infer<T>,
+    errors: form.errors,
+    meta: form.meta,
+
+    // 字段
+    fields,
+
+    // 状态
+    isSubmitting,
+    serverError,
+    isSubmitted,
+    isValid,
+    isDirty,
+    hasErrors,
+
+    // 方法
+    handleSubmit,
+    resetForm,
+    setFieldValue,
+    setFieldValues,
+    setErrors,
+    validateAll,
+    validateField,
+    getFieldError,
+    hasFieldError,
+    getValues,
+    getFieldValue,
+    focusField,
+    clearFieldError,
+    clearAllErrors,
+    scrollToError,
+  }
+}
+
+// 密码强度计算
+export function usePasswordStrength() {
+  const calculateStrength = (password: string): { score: number; text: string; color: string } => {
+    let score = 0
+
+    // 长度检查
+    if (password.length >= 8) score++
+    if (password.length >= 12) score++
+
+    // 字符类型检查
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++
+    if (/\d/.test(password)) score++
+    if (/[^a-zA-Z0-9]/.test(password)) score++
+
+    // 常见密码检查
+    const commonPasswords = ['password', '123456', 'qwerty', 'admin', 'letmein']
+    if (commonPasswords.some((common) => password.toLowerCase().includes(common))) {
+      score = Math.max(0, score - 2)
+    }
+
+    // 重复字符检查
+    const repeatedChars = password.match(/(.)\1{2,}/g)
+    if (repeatedChars) {
+      score = Math.max(0, score - 1)
+    }
+
+    let text = ''
+    let color = ''
+
+    switch (score) {
+      case 0:
+      case 1:
+        text = '弱'
+        color = '#ef4444'
+        break
+      case 2:
+      case 3:
+        text = '中等'
+        color = '#f59e0b'
+        break
+      case 4:
+      case 5:
+        text = '强'
+        color = '#10b981'
+        break
+      default:
+        text = '未知'
+        color = '#6b7280'
+    }
+
+    return { score, text, color }
+  }
+
+  return {
+    calculateStrength,
+  }
+}

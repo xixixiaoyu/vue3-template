@@ -1,13 +1,10 @@
 <script setup lang="ts">
-// 定义组件名称
-defineOptions({
-  name: 'RegisterPage',
-})
-import { ref, computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useFormValidation, validationRules, useAutoAnimate, useSeo } from '@/composables'
+import { useEnhancedFormValidation, usePasswordStrength } from '@/composables'
 import { useLocale } from '@/composables/useI18n'
+import { useSeo } from '@/composables/useSeo'
 import { z } from 'zod'
 import {
   UserPlus,
@@ -15,24 +12,39 @@ import {
   Lock,
   Eye,
   EyeOff,
-  Moon,
-  Sun,
-  Languages,
   User,
   Shield,
+  ArrowRight,
+  CheckCircle,
+  AlertCircle,
+  Info,
 } from 'lucide-vue-next'
-import OAuthButtons from '@/components/auth/OAuthButtons.vue'
+import { AuthLayout, EnhancedOAuthButtons } from '@/components/auth'
+
+defineOptions({
+  name: 'RegisterPage',
+})
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { t } = useLocale()
+
+// 表单状态
+const showPassword = ref(false)
+const showConfirmPassword = ref(false)
+const isFormVisible = ref(false)
+const showSuccessDialog = ref(false)
+
+// 密码强度计算
+const { calculateStrength } = usePasswordStrength()
 
 // 定义表单验证 schema
 const registerSchema = z
   .object({
-    email: validationRules.email,
-    password: validationRules.password,
-    confirmPassword: z.string().min(1, '请确认密码'),
     name: z.string().min(2, '姓名至少需要 2 个字符').max(50, '姓名不能超过 50 个字符'),
+    email: z.string().email('请输入有效的邮箱地址'),
+    password: z.string().min(6, '密码至少需要 6 个字符'),
+    confirmPassword: z.string().min(1, '请确认密码'),
     agreeToTerms: z.boolean().refine((val) => val === true, '请同意服务条款和隐私政策'),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -40,97 +52,82 @@ const registerSchema = z
     path: ['confirmPassword'],
   })
 
-// 使用表单验证
-const { fields, isSubmitting, serverError, handleSubmit } = useFormValidation({
-  schema: registerSchema,
-  initialValues: {
-    email: '',
-    password: '',
-    confirmPassword: '',
-    name: '',
-    agreeToTerms: false,
-  },
-  onSubmit: async (values) => {
-    const result = await authStore.signUp(values.email, values.password)
+// 使用增强表单验证
+const { fields, isSubmitting, serverError, handleSubmit, setParentRef, isValid, clearAllErrors } =
+  useEnhancedFormValidation({
+    schema: registerSchema,
+    initialValues: {
+      name: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      agreeToTerms: false,
+    },
+    onSubmit: async (values) => {
+      const result = await authStore.signUp(values.email, values.password)
 
-    // 注册成功后更新用户资料
-    if (result.success && values.name) {
-      await authStore.updateProfile({
-        full_name: values.name,
-      })
-    }
+      // 注册成功后更新用户资料
+      if (result.success && values.name) {
+        await authStore.updateProfile({
+          full_name: values.name,
+        })
+      }
 
-    if (result.success) {
-      // 注册成功，显示成功消息
-      showSuccessMessage()
-      // 延迟重定向到登录页
-      setTimeout(() => {
-        router.push({ name: 'login' })
-      }, 2000)
-    } else {
-      // 注册失败，抛出错误让 composable 处理
-      throw new Error(result.error || '注册失败，请重试')
-    }
-  },
-})
+      if (result.success) {
+        // 显示成功对话框
+        showSuccessDialog.value = true
 
-// 表单状态
-const showPassword = ref(false)
-const showConfirmPassword = ref(false)
-const isDark = ref(false)
-const showSuccessDialog = ref(false)
+        // 延迟重定向到登录页
+        setTimeout(() => {
+          router.push({ name: 'login' })
+        }, 3000)
+      } else {
+        // 注册失败，抛出错误让 composable 处理
+        throw new Error(result.error || '注册失败，请重试')
+      }
+    },
+    onSuccess: () => {
+      // 注册成功后的额外处理
+      isFormVisible.value = false
+    },
+  })
 
 // 计算属性
 const isLoading = computed(() => isSubmitting.value || authStore.loading)
 const hasError = computed(() => !!(serverError.value || authStore.error))
 const errorMessage = computed(() => serverError.value || authStore.error || '')
+
+// 密码强度计算
 const passwordStrength = computed(() => {
+  return calculateStrength(fields.password.value || '')
+})
+
+// 密码要求检查
+const passwordRequirements = computed(() => {
   const password = fields.password.value || ''
-  let strength = 0
-
-  if (password.length >= 8) strength++
-  if (password.length >= 12) strength++
-  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++
-  if (/\d/.test(password)) strength++
-  if (/[^a-zA-Z0-9]/.test(password)) strength++
-
-  return strength
+  return [
+    {
+      text: '至少 6 个字符',
+      met: password.length >= 6,
+    },
+    {
+      text: '包含大写字母',
+      met: /[A-Z]/.test(password),
+    },
+    {
+      text: '包含小写字母',
+      met: /[a-z]/.test(password),
+    },
+    {
+      text: '包含数字',
+      met: /\d/.test(password),
+    },
+    {
+      text: '包含特殊字符',
+      met: /[^a-zA-Z0-9]/.test(password),
+    },
+  ]
 })
-
-const passwordStrengthText = computed(() => {
-  switch (passwordStrength.value) {
-    case 0:
-    case 1:
-      return '弱'
-    case 2:
-    case 3:
-      return '中等'
-    case 4:
-    case 5:
-      return '强'
-    default:
-      return ''
-  }
-})
-
-const passwordStrengthColor = computed(() => {
-  switch (passwordStrength.value) {
-    case 0:
-    case 1:
-      return '#d03050'
-    case 2:
-    case 3:
-      return '#f0a020'
-    case 4:
-    case 5:
-      return '#18a058'
-    default:
-      return '#909399'
-  }
-})
-
-// 获取国际化函数
-const { t, toggleLocale } = useLocale()
 
 // 切换到登录页面
 const goToLogin = () => {
@@ -147,15 +144,14 @@ const toggleConfirmPasswordVisibility = () => {
   showConfirmPassword.value = !showConfirmPassword.value
 }
 
-// 切换主题
-const toggleTheme = () => {
-  isDark.value = !isDark.value
-  // 这里可以添加实际的主题切换逻辑
-}
-
-// 显示成功消息
-const showSuccessMessage = () => {
-  showSuccessDialog.value = true
+// 快捷键处理
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault()
+    if (isValid.value) {
+      handleSubmit()
+    }
+  }
 }
 
 // 设置 SEO 元数据
@@ -166,277 +162,491 @@ useSeo({
   robots: 'noindex,nofollow',
 })
 
-// 设置动画
-const [, setParent] = useAutoAnimate()
+// 监听密码变化，实时验证确认密码
+watch(
+  () => fields.password.value,
+  () => {
+    if (fields.confirmPassword.value) {
+      fields.confirmPassword.validate()
+    }
+  }
+)
+
+// 页面加载动画
+setTimeout(() => {
+  isFormVisible.value = true
+}, 100)
 </script>
 
 <template>
-  <div
-    class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4"
+  <AuthLayout
+    :title="t('auth.createAccount')"
+    :subtitle="t('auth.registerSubtitle')"
+    :logo-icon="UserPlus"
+    :footer-text="t('auth.registerTermsNotice')"
   >
-    <div class="w-full max-w-md">
-      <!-- 顶部工具栏 -->
-      <div class="flex justify-between items-center mb-6">
-        <!-- 主题切换按钮 -->
-        <n-button circle @click="toggleTheme" size="small">
-          <template #icon>
-            <n-icon>
-              <Sun v-if="isDark" />
-              <Moon v-else />
-            </n-icon>
-          </template>
-        </n-button>
-
-        <!-- 语言切换按钮 -->
-        <n-button circle @click="toggleLocale" size="small">
-          <template #icon>
-            <n-icon>
-              <Languages />
-            </n-icon>
-          </template>
-        </n-button>
+    <div ref="setParentRef" class="space-y-6">
+      <!-- 页面标题 -->
+      <div class="text-center">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+          {{ t('auth.register') }}
+        </h2>
+        <p class="text-gray-600 dark:text-gray-400">
+          {{ t('auth.hasAccount') }}
+          <button
+            @click="goToLogin"
+            class="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+          >
+            {{ t('auth.login') }}
+          </button>
+        </p>
       </div>
 
-      <!-- 品牌标识区域 -->
-      <div class="text-center mb-8">
-        <n-avatar
-          :size="64"
-          :style="{ backgroundColor: '#2563eb' }"
-          class="mb-6 transition-all duration-300 hover:scale-105"
+      <!-- OAuth 注册 -->
+      <EnhancedOAuthButtons redirect-path="/" :size="'medium'" :layout="'grid'" />
+
+      <!-- 错误提示 -->
+      <div v-if="hasError" class="error-alert" role="alert" aria-live="polite">
+        <div
+          class="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
         >
-          <n-icon size="32" color="white">
-            <UserPlus />
-          </n-icon>
-        </n-avatar>
-        <n-h1 class="mb-3 tracking-tight"> {{ t('auth.createAccount') || '创建新账户' }} </n-h1>
-        <n-p depth="3" class="text-lg leading-relaxed">
-          {{ t('auth.registerSubtitle') || '注册以开始使用我们的服务' }}
-        </n-p>
+          <div class="flex-shrink-0">
+            <AlertCircle class="w-5 h-5 text-red-400" />
+          </div>
+          <div class="flex-1">
+            <h3 class="text-sm font-medium text-red-800 dark:text-red-200">注册失败</h3>
+            <p class="mt-1 text-sm text-red-700 dark:text-red-300">
+              {{ errorMessage }}
+            </p>
+          </div>
+          <button
+            @click="clearAllErrors"
+            class="flex-shrink-0 text-red-400 hover:text-red-500 dark:hover:text-red-300 transition-colors"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fill-rule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      <!-- 注册卡片 -->
-      <n-card>
-        <div class="space-y-6">
-          <div class="text-center">
-            <n-h2>{{ t('auth.register') }}</n-h2>
-            <n-p depth="3" class="text-base leading-relaxed">
-              {{ t('auth.hasAccount') || '已有账户？' }}
-              <n-button text type="primary" @click="goToLogin">
-                {{ t('auth.login') || '立即登录' }}
-              </n-button>
-            </n-p>
+      <!-- 注册表单 -->
+      <form
+        @submit.prevent="handleSubmit"
+        @keydown="handleKeydown"
+        class="space-y-5"
+        :class="{ 'form-visible': isFormVisible }"
+      >
+        <!-- 姓名输入 -->
+        <div class="form-group">
+          <label for="name" class="form-label">
+            {{ t('auth.name') || '姓名' }}
+          </label>
+          <div class="form-input-wrapper">
+            <div class="form-input-icon">
+              <User class="w-5 h-5 text-gray-400" />
+            </div>
+            <input
+              id="name"
+              v-model="fields.name.value"
+              @blur="fields.name.validate"
+              type="text"
+              autocomplete="name"
+              :placeholder="t('auth.namePlaceholder') || '请输入您的姓名'"
+              class="form-input"
+              :class="{
+                'form-input--error': fields.name.errorMessage,
+                'form-input--focused': fields.name.touched && !fields.name.errorMessage,
+              }"
+            />
           </div>
-
-          <!-- OAuth 注册 -->
-          <OAuthButtons :redirect-path="'/'" />
-
-          <!-- 错误提示 -->
-          <n-alert v-if="hasError" type="error" :title="errorMessage" show-icon />
-
-          <form ref="setParent" class="space-y-5" @submit.prevent="handleSubmit">
-            <!-- 姓名输入 -->
-            <n-form-item
-              :validation-status="fields.name.errorMessage ? 'error' : undefined"
-              :feedback="fields.name.errorMessage"
-            >
-              <template #label> {{ t('auth.name') || '姓名' }} </template>
-              <n-input
-                v-model:value="fields.name.value"
-                @blur="fields.name.validate"
-                type="text"
-                autocomplete="name"
-                :placeholder="t('auth.namePlaceholder') || '请输入您的姓名'"
-                size="large"
-                :input-props="{ class: 'pl-10' }"
-              >
-                <template #prefix>
-                  <n-icon>
-                    <User />
-                  </n-icon>
-                </template>
-              </n-input>
-            </n-form-item>
-
-            <!-- 邮箱输入 -->
-            <n-form-item
-              :validation-status="fields.email.errorMessage ? 'error' : undefined"
-              :feedback="fields.email.errorMessage"
-            >
-              <template #label> {{ t('auth.email') }} </template>
-              <n-input
-                v-model:value="fields.email.value"
-                @blur="fields.email.validate"
-                type="text"
-                inputmode="email"
-                autocomplete="email"
-                :placeholder="t('auth.emailPlaceholder') || 'your@email.com'"
-                size="large"
-                :input-props="{ class: 'pl-10' }"
-              >
-                <template #prefix>
-                  <n-icon>
-                    <Mail />
-                  </n-icon>
-                </template>
-              </n-input>
-            </n-form-item>
-
-            <!-- 密码输入 -->
-            <n-form-item
-              :validation-status="fields.password.errorMessage ? 'error' : undefined"
-              :feedback="fields.password.errorMessage"
-            >
-              <template #label>
-                <div class="flex items-center justify-between w-full">
-                  <span>{{ t('auth.password') }}</span>
-                  <div class="flex items-center gap-2">
-                    <div
-                      class="w-12 h-1 rounded-full"
-                      :style="{ backgroundColor: passwordStrengthColor }"
-                    ></div>
-                    <n-text :style="{ color: passwordStrengthColor }" class="text-xs">
-                      {{ passwordStrengthText }}
-                    </n-text>
-                  </div>
-                </div>
-              </template>
-              <n-input
-                v-model:value="fields.password.value"
-                @blur="fields.password.validate"
-                :type="showPassword ? 'text' : 'password'"
-                autocomplete="new-password"
-                :placeholder="t('auth.passwordPlaceholder') || '••••••••'"
-                size="large"
-                :input-props="{ class: 'pl-10 pr-10' }"
-              >
-                <template #prefix>
-                  <n-icon>
-                    <Lock />
-                  </n-icon>
-                </template>
-                <template #suffix>
-                  <n-button
-                    text
-                    size="small"
-                    @click="togglePasswordVisibility"
-                    :disabled="isLoading"
-                  >
-                    <n-icon>
-                      <Eye v-if="!showPassword" />
-                      <EyeOff v-else />
-                    </n-icon>
-                  </n-button>
-                </template>
-              </n-input>
-            </n-form-item>
-
-            <!-- 确认密码输入 -->
-            <n-form-item
-              :validation-status="fields.confirmPassword.errorMessage ? 'error' : undefined"
-              :feedback="fields.confirmPassword.errorMessage"
-            >
-              <template #label> {{ t('auth.confirmPassword') }} </template>
-              <n-input
-                v-model:value="fields.confirmPassword.value"
-                @blur="fields.confirmPassword.validate"
-                :type="showConfirmPassword ? 'text' : 'password'"
-                autocomplete="new-password"
-                :placeholder="t('auth.confirmPasswordPlaceholder') || '••••••••'"
-                size="large"
-                :input-props="{ class: 'pl-10 pr-10' }"
-              >
-                <template #prefix>
-                  <n-icon>
-                    <Shield />
-                  </n-icon>
-                </template>
-                <template #suffix>
-                  <n-button
-                    text
-                    size="small"
-                    @click="toggleConfirmPasswordVisibility"
-                    :disabled="isLoading"
-                  >
-                    <n-icon>
-                      <Eye v-if="!showConfirmPassword" />
-                      <EyeOff v-else />
-                    </n-icon>
-                  </n-button>
-                </template>
-              </n-input>
-            </n-form-item>
-
-            <!-- 服务条款 -->
-            <n-form-item
-              :validation-status="fields.agreeToTerms.errorMessage ? 'error' : undefined"
-              :feedback="fields.agreeToTerms.errorMessage"
-            >
-              <n-checkbox
-                v-model:checked="fields.agreeToTerms.value"
-                @blur="fields.agreeToTerms.validate"
-              >
-                {{ t('auth.agreeToTerms') || '我同意' }}
-                <n-button text type="primary" size="tiny">{{
-                  t('auth.termsOfService') || '服务条款'
-                }}</n-button>
-                {{ t('auth.and') || '和' }}
-                <n-button text type="primary" size="tiny">{{
-                  t('auth.privacyPolicy') || '隐私政策'
-                }}</n-button>
-              </n-checkbox>
-            </n-form-item>
-
-            <!-- 提交按钮 -->
-            <n-button type="primary" size="large" :loading="isLoading" block @click="handleSubmit">
-              {{
-                isLoading
-                  ? t('auth.registering') || '注册中...'
-                  : t('auth.createAccount') || '创建账户'
-              }}
-            </n-button>
-          </form>
+          <transition name="error-fade">
+            <p v-if="fields.name.errorMessage" class="form-error">
+              {{ fields.name.errorMessage }}
+            </p>
+          </transition>
         </div>
-      </n-card>
 
-      <!-- 底部信息 -->
-      <div class="text-center mt-6">
-        <n-text depth="3" class="text-sm leading-relaxed">
-          {{ t('auth.registerTermsNotice') || '注册即表示您同意我们的服务条款和隐私政策' }}
-        </n-text>
+        <!-- 邮箱输入 -->
+        <div class="form-group">
+          <label for="email" class="form-label">
+            {{ t('auth.email') }}
+          </label>
+          <div class="form-input-wrapper">
+            <div class="form-input-icon">
+              <Mail class="w-5 h-5 text-gray-400" />
+            </div>
+            <input
+              id="email"
+              v-model="fields.email.value"
+              @blur="fields.email.validate"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              :placeholder="t('auth.emailPlaceholder')"
+              class="form-input"
+              :class="{
+                'form-input--error': fields.email.errorMessage,
+                'form-input--focused': fields.email.touched && !fields.email.errorMessage,
+              }"
+            />
+          </div>
+          <transition name="error-fade">
+            <p v-if="fields.email.errorMessage" class="form-error">
+              {{ fields.email.errorMessage }}
+            </p>
+          </transition>
+        </div>
+
+        <!-- 密码输入 -->
+        <div class="form-group">
+          <label for="password" class="form-label">
+            <div class="flex items-center justify-between w-full">
+              <span>{{ t('auth.password') }}</span>
+              <div class="flex items-center gap-2">
+                <div class="w-16 h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                  <div
+                    class="h-full transition-all duration-300"
+                    :style="{
+                      width: `${(passwordStrength.score / 5) * 100}%`,
+                      backgroundColor: passwordStrength.color,
+                    }"
+                  ></div>
+                </div>
+                <span class="text-xs font-medium" :style="{ color: passwordStrength.color }">
+                  {{ passwordStrength.text }}
+                </span>
+              </div>
+            </div>
+          </label>
+          <div class="form-input-wrapper">
+            <div class="form-input-icon">
+              <Lock class="w-5 h-5 text-gray-400" />
+            </div>
+            <input
+              id="password"
+              v-model="fields.password.value"
+              @blur="fields.password.validate"
+              :type="showPassword ? 'text' : 'password'"
+              autocomplete="new-password"
+              :placeholder="t('auth.passwordPlaceholder')"
+              class="form-input pr-12"
+              :class="{
+                'form-input--error': fields.password.errorMessage,
+                'form-input--focused': fields.password.touched && !fields.password.errorMessage,
+              }"
+            />
+            <button
+              type="button"
+              @click="togglePasswordVisibility"
+              :disabled="isLoading"
+              class="form-input-suffix"
+            >
+              <EyeOff v-if="showPassword" class="w-4 h-4 text-gray-400" />
+              <Eye v-else class="w-4 h-4 text-gray-400" />
+            </button>
+          </div>
+          <transition name="error-fade">
+            <p v-if="fields.password.errorMessage" class="form-error">
+              {{ fields.password.errorMessage }}
+            </p>
+          </transition>
+
+          <!-- 密码要求提示 -->
+          <div
+            v-if="fields.password.value"
+            class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
+          >
+            <div class="flex items-start gap-2 mb-2">
+              <Info class="w-4 h-4 text-blue-500 mt-0.5" />
+              <span class="text-sm font-medium text-blue-800 dark:text-blue-200"> 密码要求 </span>
+            </div>
+            <div class="space-y-1">
+              <div
+                v-for="requirement in passwordRequirements"
+                :key="requirement.text"
+                class="flex items-center gap-2 text-sm"
+              >
+                <CheckCircle v-if="requirement.met" class="w-3 h-3 text-green-500" />
+                <div
+                  v-else
+                  class="w-3 h-3 rounded-full border border-gray-300 dark:border-gray-600"
+                />
+                <span
+                  :class="{
+                    'text-green-700 dark:text-green-300': requirement.met,
+                    'text-gray-600 dark:text-gray-400': !requirement.met,
+                  }"
+                >
+                  {{ requirement.text }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 确认密码输入 -->
+        <div class="form-group">
+          <label for="confirmPassword" class="form-label">
+            {{ t('auth.confirmPassword') }}
+          </label>
+          <div class="form-input-wrapper">
+            <div class="form-input-icon">
+              <Shield class="w-5 h-5 text-gray-400" />
+            </div>
+            <input
+              id="confirmPassword"
+              v-model="fields.confirmPassword.value"
+              @blur="fields.confirmPassword.validate"
+              :type="showConfirmPassword ? 'text' : 'password'"
+              autocomplete="new-password"
+              :placeholder="t('auth.confirmPasswordPlaceholder')"
+              class="form-input pr-12"
+              :class="{
+                'form-input--error': fields.confirmPassword.errorMessage,
+                'form-input--focused':
+                  fields.confirmPassword.touched && !fields.confirmPassword.errorMessage,
+              }"
+            />
+            <button
+              type="button"
+              @click="toggleConfirmPasswordVisibility"
+              :disabled="isLoading"
+              class="form-input-suffix"
+            >
+              <EyeOff v-if="showConfirmPassword" class="w-4 h-4 text-gray-400" />
+              <Eye v-else class="w-4 h-4 text-gray-400" />
+            </button>
+          </div>
+          <transition name="error-fade">
+            <p v-if="fields.confirmPassword.errorMessage" class="form-error">
+              {{ fields.confirmPassword.errorMessage }}
+            </p>
+          </transition>
+        </div>
+
+        <!-- 服务条款 -->
+        <div class="form-group">
+          <label class="flex items-start gap-3 cursor-pointer">
+            <input
+              v-model="fields.agreeToTerms.value"
+              @blur="fields.agreeToTerms.validate"
+              type="checkbox"
+              class="form-checkbox mt-1"
+            />
+            <span class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+              {{ t('auth.agreeToTerms') }}
+              <button
+                type="button"
+                class="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+              >
+                {{ t('auth.termsOfService') }}
+              </button>
+              {{ t('auth.and') }}
+              <button
+                type="button"
+                class="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
+              >
+                {{ t('auth.privacyPolicy') }}
+              </button>
+            </span>
+          </label>
+          <transition name="error-fade">
+            <p v-if="fields.agreeToTerms.errorMessage" class="form-error">
+              {{ fields.agreeToTerms.errorMessage }}
+            </p>
+          </transition>
+        </div>
+
+        <!-- 提交按钮 -->
+        <button
+          type="submit"
+          :disabled="isLoading || !isValid"
+          class="form-submit-button"
+          :class="{ 'form-submit-button--loading': isLoading }"
+        >
+          <span v-if="isLoading" class="form-submit-button__loading">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            {{ t('auth.registering') }}
+          </span>
+          <span v-else class="form-submit-button__content">
+            {{ t('auth.createAccount') }}
+            <ArrowRight class="w-4 h-4 ml-2" />
+          </span>
+        </button>
+      </form>
+    </div>
+  </AuthLayout>
+
+  <!-- 注册成功对话框 -->
+  <div
+    v-if="showSuccessDialog"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+    @click.self="showSuccessDialog = false"
+  >
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all"
+    >
+      <div class="text-center">
+        <div
+          class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center"
+        >
+          <CheckCircle class="w-8 h-8 text-green-600 dark:text-green-400" />
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
+          {{ t('auth.registrationSuccessful') }}
+        </h3>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">
+          {{ t('auth.registrationSuccessMessage') }}
+        </p>
+        <div class="flex items-center justify-center">
+          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+          <span class="ml-3 text-sm text-gray-500 dark:text-gray-400"> 正在跳转到登录页面... </span>
+        </div>
       </div>
     </div>
-
-    <!-- 注册成功对话框 -->
-    <n-modal v-model:show="showSuccessDialog" :mask-closable="false" :closable="false">
-      <n-card
-        style="max-width: 400px"
-        title="注册成功"
-        :bordered="false"
-        size="huge"
-        role="dialog"
-        aria-modal="true"
-      >
-        <template #header-extra>
-          <n-button size="small" circle @click="showSuccessDialog = false">
-            <template #icon>
-              <n-icon>
-                <EyeOff />
-              </n-icon>
-            </template>
-          </n-button>
-        </template>
-        <div class="text-center py-4">
-          <n-avatar :size="64" :style="{ backgroundColor: '#18a058' }" class="mb-4">
-            <n-icon size="32" color="white">
-              <UserPlus />
-            </n-icon>
-          </n-avatar>
-          <n-h3 class="mb-2">{{ t('auth.registrationSuccessful') || '注册成功' }}</n-h3>
-          <n-p depth="3">
-            {{ t('auth.registrationSuccessMessage') || '您的账户已创建成功，即将跳转到仪表板...' }}
-          </n-p>
-        </div>
-      </n-card>
-    </n-modal>
   </div>
 </template>
+
+<style scoped>
+.form-visible {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-fade-enter-active,
+.error-fade-leave-active {
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+
+.error-fade-enter-from,
+.error-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.form-group {
+  @apply space-y-2;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 dark:text-gray-300;
+}
+
+.form-input-wrapper {
+  @apply relative;
+}
+
+.form-input-icon {
+  @apply absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none;
+}
+
+.form-input {
+  @apply w-full pl-10 pr-3 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200;
+}
+
+.form-input.pr-12 {
+  padding-right: 3rem;
+}
+
+.form-input--error {
+  @apply border-red-300 dark:border-red-600 focus:ring-red-500;
+}
+
+.form-input--focused {
+  @apply border-blue-300 dark:border-blue-600 focus:ring-blue-500;
+}
+
+.form-input-suffix {
+  @apply absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors;
+}
+
+.form-error {
+  @apply text-sm text-red-600 dark:text-red-400 mt-1;
+}
+
+.form-checkbox {
+  @apply h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500 dark:focus:ring-blue-400 dark:focus:ring-offset-gray-900;
+}
+
+.form-submit-button {
+  @apply w-full flex items-center justify-center px-4 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200;
+}
+
+.form-submit-button--loading {
+  @apply opacity-75 cursor-not-allowed;
+}
+
+.form-submit-button__loading {
+  @apply flex items-center;
+}
+
+.form-submit-button__content {
+  @apply flex items-center;
+}
+
+.error-alert {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .form-input {
+    @apply py-2 text-base;
+  }
+
+  .form-submit-button {
+    @apply py-3 text-base;
+  }
+}
+
+/* 深色模式优化 */
+@media (prefers-color-scheme: dark) {
+  .form-input {
+    @apply bg-gray-800 text-white;
+  }
+}
+</style>

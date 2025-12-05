@@ -23,7 +23,7 @@ export function useEnhancedFormValidation<T extends z.ZodObject<any>>(
 
   const form = useForm({
     validationSchema: toTypedSchema(options.schema),
-    initialValues: options.initialValues || ({} as z.infer<T>),
+    initialValues: (options.initialValues as any) || {},
     validateOnMount: false,
   })
 
@@ -50,21 +50,37 @@ export function useEnhancedFormValidation<T extends z.ZodObject<any>>(
   >({})
 
   // 获取 schema 中的所有字段名
-  const fieldNames = Object.keys(options.schema.shape)
+  const fieldNames = Object.keys(options.schema?.shape || {})
 
   fieldNames.forEach((fieldName) => {
-    const { value, errorMessage, meta, validate } = useField(fieldName)
-    fields[fieldName] = reactive({
-      value,
-      errorMessage,
-      meta,
-      validate,
-      name: fieldName,
-      touched: computed(() => meta.touched),
-      dirty: computed(() => meta.dirty),
-      valid: computed(() => meta.valid),
-      invalid: computed(() => !meta.valid),
-    })
+    try {
+      const { value, errorMessage, meta, validate } = useField(fieldName)
+      fields[fieldName] = reactive({
+        value,
+        errorMessage,
+        meta,
+        validate,
+        name: fieldName,
+        touched: computed(() => meta.touched),
+        dirty: computed(() => meta.dirty),
+        valid: computed(() => meta.valid),
+        invalid: computed(() => !meta.valid),
+      })
+    } catch (error) {
+      console.error(`Error creating field ${fieldName}:`, error)
+      // 创建一个安全的默认字段对象
+      fields[fieldName] = reactive({
+        value: ref(''),
+        errorMessage: ref(''),
+        meta: reactive({ touched: false, dirty: false, valid: false }),
+        validate: async () => ({ valid: false }),
+        name: fieldName,
+        touched: computed(() => false),
+        dirty: computed(() => false),
+        valid: computed(() => false),
+        invalid: computed(() => true),
+      })
+    }
   })
 
   const handleSubmit = form.handleSubmit(async (values: z.infer<T>) => {
@@ -122,20 +138,20 @@ export function useEnhancedFormValidation<T extends z.ZodObject<any>>(
 
   // 设置字段值
   const setFieldValue = (fieldName: string, value: any) => {
-    form.setFieldValue(fieldName, value)
+    form.setFieldValue(fieldName as any, value)
   }
 
   // 设置多个字段值
   const setFieldValues = (values: Partial<z.infer<T>>) => {
     Object.entries(values).forEach(([field, value]) => {
-      form.setFieldValue(field, value)
+      form.setFieldValue(field as any, value)
     })
   }
 
   // 设置错误
   const setErrors = (errors: Record<string, string>) => {
     Object.entries(errors).forEach(([field, message]) => {
-      form.setFieldError(field, message)
+      form.setFieldError(field as any, message)
     })
   }
 
@@ -195,13 +211,13 @@ export function useEnhancedFormValidation<T extends z.ZodObject<any>>(
 
   // 清除特定字段错误
   const clearFieldError = (fieldName: string) => {
-    form.setFieldError(fieldName, undefined)
+    form.setFieldError(fieldName as any, undefined)
   }
 
   // 清除所有错误
   const clearAllErrors = () => {
     Object.keys(fields).forEach((fieldName) => {
-      form.setFieldError(fieldName, undefined)
+      form.setFieldError(fieldName as any, undefined)
     })
     serverError.value = ''
   }

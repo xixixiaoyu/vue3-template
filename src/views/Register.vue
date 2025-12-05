@@ -99,12 +99,12 @@ const errorMessage = computed(() => serverError.value || authStore.error || '')
 
 // 密码强度计算
 const passwordStrength = computed(() => {
-  return calculateStrength(fields.password.value || '')
+  return calculateStrength(fields.password?.value || '')
 })
 
 // 密码要求检查
 const passwordRequirements = computed(() => {
-  const password = fields.password.value || ''
+  const password = fields.password?.value || ''
   return [
     {
       text: '至少 6 个字符',
@@ -144,6 +144,22 @@ const toggleConfirmPasswordVisibility = () => {
   showConfirmPassword.value = !showConfirmPassword.value
 }
 
+// 安全的输入处理函数
+const handleInput = (fieldName: string, event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (fields[fieldName] && target) {
+    fields[fieldName].value = target.value
+  }
+}
+
+// 安全的复选框处理函数
+const handleCheckboxChange = (fieldName: string, event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (fields[fieldName] && target) {
+    fields[fieldName].value = target.checked
+  }
+}
+
 // 快捷键处理
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Enter' && !event.shiftKey) {
@@ -164,9 +180,9 @@ useSeo({
 
 // 监听密码变化，实时验证确认密码
 watch(
-  () => fields.password.value,
+  () => fields.password?.value,
   () => {
-    if (fields.confirmPassword.value) {
+    if (fields.confirmPassword?.value) {
       fields.confirmPassword.validate()
     }
   }
@@ -252,21 +268,22 @@ setTimeout(() => {
             </div>
             <input
               id="name"
-              v-model="fields.name.value"
-              @blur="fields.name.validate"
+              :value="fields.name?.value"
+              @input="handleInput('name', $event)"
+              @blur="fields.name?.validate"
               type="text"
               autocomplete="name"
               :placeholder="t('auth.namePlaceholder') || '请输入您的姓名'"
               class="form-input"
               :class="{
-                'form-input--error': fields.name.errorMessage,
-                'form-input--focused': fields.name.touched && !fields.name.errorMessage,
+                'form-input--error': fields.name?.errorMessage,
+                'form-input--focused': fields.name?.touched && !fields.name?.errorMessage,
               }"
             />
           </div>
           <transition name="error-fade">
-            <p v-if="fields.name.errorMessage" class="form-error">
-              {{ fields.name.errorMessage }}
+            <p v-if="fields.name?.errorMessage" class="form-error">
+              {{ fields.name?.errorMessage }}
             </p>
           </transition>
         </div>
@@ -282,22 +299,23 @@ setTimeout(() => {
             </div>
             <input
               id="email"
-              v-model="fields.email.value"
-              @blur="fields.email.validate"
+              :value="fields.email?.value"
+              @input="handleInput('email', $event)"
+              @blur="fields.email?.validate"
               type="email"
               inputmode="email"
               autocomplete="email"
               :placeholder="t('auth.emailPlaceholder')"
               class="form-input"
               :class="{
-                'form-input--error': fields.email.errorMessage,
-                'form-input--focused': fields.email.touched && !fields.email.errorMessage,
+                'form-input--error': fields.email?.errorMessage,
+                'form-input--focused': fields.email?.touched && !fields.email?.errorMessage,
               }"
             />
           </div>
           <transition name="error-fade">
-            <p v-if="fields.email.errorMessage" class="form-error">
-              {{ fields.email.errorMessage }}
+            <p v-if="fields.email?.errorMessage" class="form-error">
+              {{ fields.email?.errorMessage }}
             </p>
           </transition>
         </div>
@@ -329,15 +347,16 @@ setTimeout(() => {
             </div>
             <input
               id="password"
-              v-model="fields.password.value"
-              @blur="fields.password.validate"
+              :value="fields.password?.value"
+              @input="handleInput('password', $event)"
+              @blur="fields.password?.validate"
               :type="showPassword ? 'text' : 'password'"
               autocomplete="new-password"
               :placeholder="t('auth.passwordPlaceholder')"
               class="form-input pr-12"
               :class="{
-                'form-input--error': fields.password.errorMessage,
-                'form-input--focused': fields.password.touched && !fields.password.errorMessage,
+                'form-input--error': fields.password?.errorMessage,
+                'form-input--focused': fields.password?.touched && !fields.password?.errorMessage,
               }"
             />
             <button
@@ -351,14 +370,14 @@ setTimeout(() => {
             </button>
           </div>
           <transition name="error-fade">
-            <p v-if="fields.password.errorMessage" class="form-error">
-              {{ fields.password.errorMessage }}
+            <p v-if="fields.password?.errorMessage" class="form-error">
+              {{ fields.password?.errorMessage }}
             </p>
           </transition>
 
           <!-- 密码要求提示 -->
           <div
-            v-if="fields.password.value"
+            v-if="fields.password?.value"
             class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
           >
             <div class="flex items-start gap-2 mb-2">
@@ -400,16 +419,17 @@ setTimeout(() => {
             </div>
             <input
               id="confirmPassword"
-              v-model="fields.confirmPassword.value"
-              @blur="fields.confirmPassword.validate"
+              :value="fields.confirmPassword?.value"
+              @input="handleInput('confirmPassword', $event)"
+              @blur="fields.confirmPassword?.validate"
               :type="showConfirmPassword ? 'text' : 'password'"
               autocomplete="new-password"
               :placeholder="t('auth.confirmPasswordPlaceholder')"
               class="form-input pr-12"
               :class="{
-                'form-input--error': fields.confirmPassword.errorMessage,
+                'form-input--error': fields.confirmPassword?.errorMessage,
                 'form-input--focused':
-                  fields.confirmPassword.touched && !fields.confirmPassword.errorMessage,
+                  fields.confirmPassword?.touched && !fields.confirmPassword?.errorMessage,
               }"
             />
             <button
@@ -423,8 +443,8 @@ setTimeout(() => {
             </button>
           </div>
           <transition name="error-fade">
-            <p v-if="fields.confirmPassword.errorMessage" class="form-error">
-              {{ fields.confirmPassword.errorMessage }}
+            <p v-if="fields.confirmPassword?.errorMessage" class="form-error">
+              {{ fields.confirmPassword?.errorMessage }}
             </p>
           </transition>
         </div>
@@ -433,8 +453,9 @@ setTimeout(() => {
         <div class="form-group">
           <label class="flex items-start gap-3 cursor-pointer">
             <input
-              v-model="fields.agreeToTerms.value"
-              @blur="fields.agreeToTerms.validate"
+              :checked="fields.agreeToTerms?.value"
+              @change="handleCheckboxChange('agreeToTerms', $event)"
+              @blur="fields.agreeToTerms?.validate"
               type="checkbox"
               class="form-checkbox mt-1"
             />
@@ -456,8 +477,8 @@ setTimeout(() => {
             </span>
           </label>
           <transition name="error-fade">
-            <p v-if="fields.agreeToTerms.errorMessage" class="form-error">
-              {{ fields.agreeToTerms.errorMessage }}
+            <p v-if="fields.agreeToTerms?.errorMessage" class="form-error">
+              {{ fields.agreeToTerms?.errorMessage }}
             </p>
           </transition>
         </div>

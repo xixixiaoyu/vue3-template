@@ -23,10 +23,6 @@ const showConfirmPassword = ref(false)
 const isFormVisible = ref(false)
 const showSuccessDialog = ref(false)
 
-// 使用 usePasswordStrength 组合式函数
-import { usePasswordStrength } from '@/composables/useEnhancedFormValidation'
-const { calculateStrength } = usePasswordStrength()
-
 // 定义表单验证 schema
 const registerSchema = z
   .object({
@@ -87,38 +83,6 @@ const { fields, isSubmitting, serverError, handleSubmit, parentRef, isValid, cle
 const isLoading = computed(() => isSubmitting.value || authStore.loading)
 const hasError = computed(() => !!(serverError.value || authStore.error))
 const errorMessage = computed(() => serverError.value || authStore.error || '')
-
-// 密码强度计算
-const passwordStrength = computed(() => {
-  return calculateStrength(fields.password?.value || '')
-})
-
-// 密码要求检查
-const passwordRequirements = computed(() => {
-  const password = fields.password?.value || ''
-  return [
-    {
-      text: t('validation.passwordMinLength'),
-      met: password.length >= 6,
-    },
-    {
-      text: t('validation.passwordUppercase') || '包含大写字母',
-      met: /[A-Z]/.test(password),
-    },
-    {
-      text: t('validation.passwordLowercase') || '包含小写字母',
-      met: /[a-z]/.test(password),
-    },
-    {
-      text: t('validation.passwordNumber') || '包含数字',
-      met: /\d/.test(password),
-    },
-    {
-      text: t('validation.passwordSpecial') || '包含特殊字符',
-      met: /[^a-zA-Z0-9]/.test(password),
-    },
-  ]
-})
 
 // 切换到登录页面
 const goToLogin = () => {
@@ -311,23 +275,7 @@ setTimeout(() => {
         <!-- 密码输入 -->
         <div class="form-group">
           <label for="password" class="form-label">
-            <div class="flex items-center justify-between w-full">
-              <span>{{ t('auth.password') }}</span>
-              <div class="flex items-center gap-2">
-                <div class="w-16 h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                  <div
-                    class="h-full transition-all duration-300"
-                    :style="{
-                      width: `${(passwordStrength.score / 5) * 100}%`,
-                      backgroundColor: passwordStrength.color,
-                    }"
-                  ></div>
-                </div>
-                <span class="text-xs font-medium" :style="{ color: passwordStrength.color }">
-                  {{ passwordStrength.text }}
-                </span>
-              </div>
-            </div>
+            {{ t('auth.password') }}
           </label>
           <div class="form-input-wrapper">
             <div class="form-input-icon">
@@ -362,40 +310,6 @@ setTimeout(() => {
               {{ fields.password?.errorMessage }}
             </p>
           </transition>
-
-          <!-- 密码要求提示 -->
-          <div
-            v-if="fields.password?.value"
-            class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
-          >
-            <div class="flex items-start gap-2 mb-2">
-              <Icon name="Info" size="16" class="text-blue-500 mt-0.5" />
-              <span class="text-sm font-medium text-blue-800 dark:text-blue-200">{{
-                t('auth.passwordRequirements') || '密码要求'
-              }}</span>
-            </div>
-            <div class="space-y-1">
-              <div
-                v-for="requirement in passwordRequirements"
-                :key="requirement.text"
-                class="flex items-center gap-2 text-sm"
-              >
-                <Icon v-if="requirement.met" name="CheckCircle" size="12" class="text-green-500" />
-                <div
-                  v-else
-                  class="w-3 h-3 rounded-full border border-gray-300 dark:border-gray-600"
-                />
-                <span
-                  :class="{
-                    'text-green-700 dark:text-green-300': requirement.met,
-                    'text-gray-600 dark:text-gray-400': !requirement.met,
-                  }"
-                >
-                  {{ requirement.text }}
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- 确认密码输入 -->

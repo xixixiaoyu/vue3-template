@@ -129,8 +129,7 @@
     "redirectingToLogin": "Redirecting to login page...",
     "createAccount": "Create Account",
     "registerDescription": "Create a new account to start using our services",
-    "registrationFailed": "Registration Failed",
-    "passwordRequirements": "Password Requirements"
+    "registrationFailed": "Registration Failed"
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -240,11 +239,6 @@
     "nameMaxLength": "Name cannot exceed 50 characters",
     "agreeToTermsRequired": "Please agree to Terms of Service and Privacy Policy"
   },
-  "passwordStrength": {
-    "weak": "Weak",
-    "medium": "Medium",
-    "strong": "Strong"
-  },
   "fileUpload": {
     "unsupportedType": "Unsupported file type. Supported types: ",
     "unsupportedFormat": "Unsupported file format. Supported formats: ",
@@ -295,11 +289,7 @@
     "minLength": "Must be at least {length} characters",
     "maxLength": "Cannot exceed {length} characters",
     "rangeMin": "Value cannot be less than {min}",
-    "rangeMax": "Value cannot be greater than {max}",
-    "passwordUppercase": "Contains uppercase letter",
-    "passwordLowercase": "Contains lowercase letter",
-    "passwordNumber": "Contains number",
-    "passwordSpecial": "Contains special character"
+    "rangeMax": "Value cannot be greater than {max}"
   },
   "realtime": {
     "connectionError": "Connection error",

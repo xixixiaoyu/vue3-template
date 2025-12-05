@@ -31,16 +31,16 @@ const email = computed(() => route.query.email as string)
 
 // 定义表单验证 schema
 const requestSchema = z.object({
-  email: z.string().min(1, t('auth.emailRequired')).email(t('validation.emailInvalid')),
+  email: z.string().min(1, t('auth.emailRequired')).email(t('validationRules.emailInvalid')),
 })
 
 const resetSchema = z
   .object({
-    password: z.string().min(6, t('validation.passwordMinLength')),
+    password: z.string().min(6, t('validationRules.passwordMinLength')),
     confirmPassword: z.string().min(1, t('validation.passwordConfirm')),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: t('validation.passwordMismatch'),
+    message: t('auth.passwordMismatch'),
     path: ['confirmPassword'],
   })
 

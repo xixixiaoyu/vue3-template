@@ -29,8 +29,8 @@ const isFormVisible = ref(false)
 
 // 定义表单验证 schema
 const loginSchema = z.object({
-  email: z.string().min(1, t('auth.emailRequired')).email(t('validation.emailInvalid')),
-  password: z.string().min(6, t('validation.passwordMinLength')),
+  email: z.string().min(1, t('auth.emailRequired')).email(t('validationRules.emailInvalid')),
+  password: z.string().min(6, t('validationRules.passwordMinLength')),
 })
 
 // 使用增强表单验证

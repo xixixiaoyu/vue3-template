@@ -27,13 +27,13 @@ const showSuccessDialog = ref(false)
 const registerSchema = z
   .object({
     name: z.string().min(2, t('validation.nameMinLength')).max(50, t('validation.nameMaxLength')),
-    email: z.string().min(1, t('auth.emailRequired')).email(t('validation.emailInvalid')),
-    password: z.string().min(6, t('validation.passwordMinLength')),
+    email: z.string().min(1, t('auth.emailRequired')).email(t('validationRules.emailInvalid')),
+    password: z.string().min(6, t('validationRules.passwordMinLength')),
     confirmPassword: z.string().min(1, t('validation.passwordConfirm')),
     agreeToTerms: z.boolean().refine((val) => val === true, t('validation.agreeToTermsRequired')),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: t('validation.passwordMismatch'),
+    message: t('auth.passwordMismatch'),
     path: ['confirmPassword'],
   })
 

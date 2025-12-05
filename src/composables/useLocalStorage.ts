@@ -115,7 +115,12 @@ export function useLocalStorageBoolean(key: string, defaultValue = false) {
 }
 
 export function useLocalStorageString(key: string, defaultValue = '') {
-  return useLocalStorage(key, defaultValue)
+  return useLocalStorage<string>(key, defaultValue, {
+    serializer: {
+      read: (value: string) => value,
+      write: (value: string) => value,
+    },
+  })
 }
 
 export function useLocalStorageNumber(key: string, defaultValue = 0) {

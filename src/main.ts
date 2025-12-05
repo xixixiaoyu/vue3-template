@@ -5,7 +5,7 @@ import { createHead } from '@unhead/vue/client'
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query'
 import App from './App.vue'
 import router from './router'
-import i18n from './locales'
+import i18n, { initI18n } from './locales'
 import { initSentry } from './lib/sentry'
 
 // Naive UI 导入
@@ -119,5 +119,8 @@ pinia.use(createPersistedState())
 app.use(pinia)
 app.use(router)
 app.use(i18n)
+
+// 初始化国际化语言设置
+initI18n()
 
 app.mount('#app')

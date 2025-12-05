@@ -97,21 +97,9 @@ onUnmounted(() => {
     <!-- 主要内容 -->
     <div class="relative z-10 w-full flex flex-col items-center">
       <!-- 顶部工具栏 -->
-      <div class="flex justify-between items-center mb-6 px-2">
-        <!-- 主题切换按钮 -->
-        <n-button
-          circle
-          @click="toggleTheme"
-          size="small"
-          class="backdrop-blur-md bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50"
-        >
-          <template #icon>
-            <Icon :name="isDark ? 'Sun' : 'Moon'" size="16" />
-          </template>
-        </n-button>
-
+      <div class="flex justify-end items-center px-2 w-full">
         <!-- 语言切换按钮 -->
-        <div ref="languageSwitcherRef" class="relative">
+        <div ref="languageSwitcherRef" class="relative mr-2">
           <n-button
             circle
             @click.stop="showLanguageSwitcher = !showLanguageSwitcher"
@@ -147,6 +135,18 @@ onUnmounted(() => {
             </div>
           </div>
         </div>
+
+        <!-- 主题切换按钮 -->
+        <n-button
+          circle
+          @click="toggleTheme"
+          size="small"
+          class="backdrop-blur-md bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50"
+        >
+          <template #icon>
+            <Icon :name="isDark ? 'Sun' : 'Moon'" size="16" />
+          </template>
+        </n-button>
       </div>
 
       <!-- 主要卡片 -->

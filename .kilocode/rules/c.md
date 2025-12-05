@@ -1,6 +1,8 @@
+# Vue 3 + Supabase 项目开发规范
+
 ## 项目概述
 
-这是一个基于 Vue 3 和 Supabase 的现代化 SaaS 产品，专注于开发效率和代码可维护性。项目使用 TypeScript 严格模式，采用 Composition API，集成了丰富的工具库和最佳实践。
+这是一个基于 Vue 3 和 Supabase 的现代化 SaaS 产品模板，专注于开发效率和代码可维护性。项目采用 TypeScript 严格模式，使用 Composition API，集成了丰富的工具库和最佳实践。
 
 ## 技术栈
 
@@ -186,49 +188,60 @@ src/
 - 组件样式隔离
 - 语义化 HTML 结构
 
-## 常用工具和函数
+## 核心工具和函数
 
 ### HTTP 请求
+
+项目已封装了 Axios，提供了统一的 HTTP 请求服务：
 
 ```typescript
 import { httpService } from '@/lib/http'
 
 // GET 请求
-const data = await httpService.get('/api/users')
+const users = await httpService.get('/users')
 
 // POST 请求
-const result = await httpService.post('/api/users', userData)
+const newUser = await httpService.post('/users', { name: 'John', email: 'john@example.com' })
 
 // 文件上传
 const formData = new FormData()
 formData.append('file', file)
-const uploadResult = await httpService.upload('/api/upload', formData)
+const result = await httpService.upload('/upload', formData)
 ```
 
-### 日期处理
+### 日期处理 (date-fns)
+
+提供了丰富的日期处理函数，支持中文本地化：
 
 ```typescript
-import { formatDate, formatRelativeTime, isToday } from '@/lib/date'
+import { formatDate, formatRelativeTime, formatDateTime, isToday, getDaysAgo } from '@/lib/date'
 
 // 格式化日期
-const formatted = formatDate(new Date(), 'yyyy年MM月dd日')
+const formatted = formatDate(new Date(), 'yyyy年MM月dd日') // 2024年01月01日
 
 // 相对时间
 const relative = formatRelativeTime(new Date()) // 3 小时前
 
 // 检查是否为今天
-const today = isToday(new Date())
+const today = isToday(new Date()) // true
+
+// 获取几天前的日期
+const weekAgo = getDaysAgo(7)
 ```
 
-### 工具函数
+### 工具函数 (lodash-es)
+
+提供了常用的工具函数，以及一些自定义的实用函数：
 
 ```typescript
 import {
   debounce,
   throttle,
   cloneDeep,
+  isEmpty,
   generateId,
   formatFileSize,
+  deepMerge,
   uniqueBy,
   arrayToTree,
 } from '@/lib/lodash'
@@ -238,14 +251,25 @@ const debouncedSearch = debounce((query: string) => {
   console.log('搜索:', query)
 }, 300)
 
+// 深拷贝
+const cloned = cloneDeep(originalObject)
+
 // 生成唯一 ID
 const id = generateId('user') // user_1640995200000_abc123def
 
 // 格式化文件大小
 const size = formatFileSize(1024 * 1024 * 5.7) // 5.7 MB
+
+// 数组去重
+const unique = uniqueBy(users, 'id')
+
+// 数组转树
+const tree = arrayToTree(flatArray)
 ```
 
 ### 通知系统
+
+提供了全局通知管理功能：
 
 ```typescript
 import { useNotification } from '@/composables/useNotification'
@@ -260,6 +284,8 @@ error('操作失败', '请检查网络连接')
 ```
 
 ### 表单验证
+
+基于 Zod 和 Vee-Validate 的表单验证系统：
 
 ```typescript
 import { useFormValidation, validationRules } from '@/composables/useFormValidation'
@@ -282,6 +308,8 @@ const { fields, isSubmitting, handleSubmit } = useFormValidation({
 
 ### 文件上传
 
+完整的文件上传功能，支持多种文件类型和验证：
+
 ```typescript
 import { useFileUpload } from '@/composables/useFileUpload'
 
@@ -292,6 +320,26 @@ const result = await uploadFile(file, {
   bucket: 'avatars',
   category: 'image',
 })
+```
+
+### Supabase 数据库操作
+
+```typescript
+import { supabase } from '@/lib/supabase'
+
+// 查询数据
+const { data, error } = await supabase.from('your_table').select('*')
+
+// 插入数据
+const { data, error } = await supabase.from('your_table').insert({ name: 'Example' })
+
+// 实时订阅
+const subscription = supabase
+  .channel('your_channel')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'your_table' }, (payload) => {
+    console.log('Change received!', payload)
+  })
+  .subscribe()
 ```
 
 ## 环境配置
@@ -408,3 +456,80 @@ pnpm build:analyze
 - 清除 node_modules 重新安装
 - 检查 TypeScript 配置
 - 确认依赖版本兼容性
+
+## 开发指南
+
+### 添加新页面
+
+1. 在 `src/views/` 目录下创建新的 Vue 组件
+2. 在 `src/router/index.ts` 中添加路由配置
+3. 如果需要认证保护，添加 `meta: { requiresAuth: true }`
+
+### 添加新的状态管理
+
+```typescript
+// src/stores/your-store.ts
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+
+export const useYourStore = defineStore('your-store', () => {
+  // 状态
+  const state = ref('initial value')
+
+  // 计算属性
+  const computedValue = computed(() => state.value.toUpperCase())
+
+  // 方法
+  const updateState = (newValue: string) => {
+    state.value = newValue
+  }
+
+  return {
+    state,
+    computedValue,
+    updateState,
+  }
+})
+```
+
+### 添加新的组合式函数
+
+```typescript
+// src/composables/useYourComposable.ts
+import { ref, computed } from 'vue'
+
+export function useYourComposable() {
+  const state = ref('initial value')
+
+  const computedValue = computed(() => state.value.toUpperCase())
+
+  const updateState = (newValue: string) => {
+    state.value = newValue
+  }
+
+  return {
+    state,
+    computedValue,
+    updateState,
+  }
+}
+```
+
+## 部署
+
+### 构建生产版本
+
+```bash
+pnpm build
+```
+
+### 部署到静态托管服务
+
+这个模板可以部署到任何支持静态文件的托管服务，如：
+
+- Vercel
+- Netlify
+- GitHub Pages
+- Firebase Hosting
+
+确保在部署时设置正确的环境变量。

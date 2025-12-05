@@ -3,9 +3,7 @@
     <n-card>
       <div class="flex items-center gap-3">
         <div class="install-icon">
-          <n-icon size="24" color="#2563eb">
-            <Download />
-          </n-icon>
+          <Icon name="Download" size="24" color="#2563eb" />
         </div>
         <div class="flex-1">
           <n-text class="font-medium text-sm">
@@ -30,7 +28,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Download } from 'lucide-vue-next'
+import { Icon } from '@/components/ui'
 import { useLocale } from '@/composables/useI18n'
 
 const { t } = useLocale()

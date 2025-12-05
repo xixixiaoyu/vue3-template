@@ -8,23 +8,17 @@
   >
     <n-button text>
       <template #icon>
-        <n-icon>
-          <Globe />
-        </n-icon>
+        <Icon name="Globe" size="16" />
       </template>
       {{ currentLanguage }}
-      <template #suffix>
-        <n-icon>
-          <ChevronDown />
-        </n-icon>
-      </template>
+      <Icon name="ChevronDown" size="16" class="ml-1" />
     </n-button>
   </n-dropdown>
 </template>
 
 <script setup lang="ts">
 import { computed, h } from 'vue'
-import { Globe, ChevronDown } from 'lucide-vue-next'
+import { Icon } from '@/components/ui'
 import { useLocale } from '@/composables/useI18n'
 import type { DropdownOption } from 'naive-ui'
 

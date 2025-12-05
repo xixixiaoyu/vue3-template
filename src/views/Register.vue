@@ -6,19 +6,7 @@ import { useEnhancedFormValidation } from '@/composables'
 import { useLocale } from '@/composables/useI18n'
 import { useSeo } from '@/composables/useSeo'
 import { z } from 'zod'
-import {
-  UserPlus,
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  User,
-  Shield,
-  ArrowRight,
-  CheckCircle,
-  AlertCircle,
-  Info,
-} from 'lucide-vue-next'
+import { Icon } from '@/components/ui'
 import { AuthLayout, EnhancedOAuthButtons } from '@/components/auth'
 
 defineOptions({
@@ -201,9 +189,11 @@ setTimeout(() => {
   <AuthLayout
     :title="t('auth.createAccount')"
     :subtitle="t('auth.registerSubtitle')"
-    :logo-icon="UserPlus"
     :footer-text="t('auth.registerTermsNotice')"
   >
+    <template #logo-icon>
+      <Icon name="UserPlus" size="32" />
+    </template>
     <div ref="parentRef" class="space-y-6">
       <!-- 页面标题 -->
       <div class="text-center">
@@ -230,7 +220,7 @@ setTimeout(() => {
           class="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
         >
           <div class="flex-shrink-0">
-            <AlertCircle class="w-5 h-5 text-red-400" />
+            <Icon name="AlertCircle" size="20" class="text-red-400" />
           </div>
           <div class="flex-1">
             <h3 class="text-sm font-medium text-red-800 dark:text-red-200">注册失败</h3>
@@ -267,7 +257,7 @@ setTimeout(() => {
           </label>
           <div class="form-input-wrapper">
             <div class="form-input-icon">
-              <User class="w-5 h-5 text-gray-400" />
+              <Icon name="User" size="20" class="text-gray-400" />
             </div>
             <input
               id="name"
@@ -298,7 +288,7 @@ setTimeout(() => {
           </label>
           <div class="form-input-wrapper">
             <div class="form-input-icon">
-              <Mail class="w-5 h-5 text-gray-400" />
+              <Icon name="Mail" size="20" class="text-gray-400" />
             </div>
             <input
               id="email"
@@ -346,7 +336,7 @@ setTimeout(() => {
           </label>
           <div class="form-input-wrapper">
             <div class="form-input-icon">
-              <Lock class="w-5 h-5 text-gray-400" />
+              <Icon name="Lock" size="20" class="text-gray-400" />
             </div>
             <input
               id="password"
@@ -368,8 +358,8 @@ setTimeout(() => {
               :disabled="isLoading"
               class="form-input-suffix"
             >
-              <EyeOff v-if="showPassword" class="w-4 h-4 text-gray-400" />
-              <Eye v-else class="w-4 h-4 text-gray-400" />
+              <Icon v-if="showPassword" name="EyeOff" size="16" class="text-gray-400" />
+              <Icon v-else name="Eye" size="16" class="text-gray-400" />
             </button>
           </div>
           <transition name="error-fade">
@@ -384,7 +374,7 @@ setTimeout(() => {
             class="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg"
           >
             <div class="flex items-start gap-2 mb-2">
-              <Info class="w-4 h-4 text-blue-500 mt-0.5" />
+              <Icon name="Info" size="16" class="text-blue-500 mt-0.5" />
               <span class="text-sm font-medium text-blue-800 dark:text-blue-200"> 密码要求 </span>
             </div>
             <div class="space-y-1">
@@ -393,7 +383,7 @@ setTimeout(() => {
                 :key="requirement.text"
                 class="flex items-center gap-2 text-sm"
               >
-                <CheckCircle v-if="requirement.met" class="w-3 h-3 text-green-500" />
+                <Icon v-if="requirement.met" name="CheckCircle" size="12" class="text-green-500" />
                 <div
                   v-else
                   class="w-3 h-3 rounded-full border border-gray-300 dark:border-gray-600"
@@ -418,7 +408,7 @@ setTimeout(() => {
           </label>
           <div class="form-input-wrapper">
             <div class="form-input-icon">
-              <Shield class="w-5 h-5 text-gray-400" />
+              <Icon name="Shield" size="20" class="text-gray-400" />
             </div>
             <input
               id="confirmPassword"
@@ -441,8 +431,8 @@ setTimeout(() => {
               :disabled="isLoading"
               class="form-input-suffix"
             >
-              <EyeOff v-if="showConfirmPassword" class="w-4 h-4 text-gray-400" />
-              <Eye v-else class="w-4 h-4 text-gray-400" />
+              <Icon v-if="showConfirmPassword" name="EyeOff" size="16" class="text-gray-400" />
+              <Icon v-else name="Eye" size="16" class="text-gray-400" />
             </button>
           </div>
           <transition name="error-fade">
@@ -513,7 +503,7 @@ setTimeout(() => {
           </span>
           <span v-else class="form-submit-button__content">
             {{ t('auth.createAccount') }}
-            <ArrowRight class="w-4 h-4 ml-2" />
+            <Icon name="ArrowRight" size="16" class="ml-2" />
           </span>
         </button>
       </form>
@@ -533,7 +523,7 @@ setTimeout(() => {
         <div
           class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center"
         >
-          <CheckCircle class="w-8 h-8 text-green-600 dark:text-green-400" />
+          <Icon name="CheckCircle" size="32" class="text-green-600 dark:text-green-400" />
         </div>
         <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
           {{ t('auth.registrationSuccessful') }}

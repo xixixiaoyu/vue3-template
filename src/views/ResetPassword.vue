@@ -6,7 +6,7 @@ import { useEnhancedFormValidation } from '@/composables'
 import { useLocale } from '@/composables/useI18n'
 import { useSeo } from '@/composables/useSeo'
 import { z } from 'zod'
-import { Lock, Eye, EyeOff, ArrowRight, CheckCircle } from 'lucide-vue-next'
+import { Icon } from '@/components/ui'
 import { AuthLayout } from '@/components/auth'
 
 defineOptions({
@@ -43,8 +43,6 @@ const resetSchema = z
     message: t('validation.passwordMismatch'),
     path: ['confirmPassword'],
   })
-
-const currentSchema = computed(() => (isResetMode.value ? resetSchema : requestSchema))
 
 // 使用增强表单验证
 const { fields, isSubmitting, serverError, handleSubmit, parentRef, isValid, clearAllErrors } =
@@ -133,9 +131,11 @@ if (resetToken.value) {
   <AuthLayout
     :title="isResetMode ? '重置密码' : '忘记密码'"
     :subtitle="isResetMode ? '请输入您的新密码' : '请输入您的邮箱地址，我们将发送重置链接给您'"
-    :logo-icon="Lock"
     :footer-text="t('auth.termsNotice')"
   >
+    <template #logo-icon>
+      <Icon name="Lock" size="32" />
+    </template>
     <div ref="parentRef" class="space-y-6">
       <!-- 页面标题 -->
       <div class="text-center">
@@ -204,7 +204,7 @@ if (resetToken.value) {
           </label>
           <div class="form-input-wrapper">
             <div class="form-input-icon">
-              <Lock class="w-5 h-5 text-gray-400" />
+              <Icon name="Lock" size="20" class="text-gray-400" />
             </div>
             <input
               id="email"
@@ -237,7 +237,7 @@ if (resetToken.value) {
             </label>
             <div class="form-input-wrapper">
               <div class="form-input-icon">
-                <Lock class="w-5 h-5 text-gray-400" />
+                <Icon name="Lock" size="20" class="text-gray-400" />
               </div>
               <input
                 id="password"
@@ -258,8 +258,8 @@ if (resetToken.value) {
                 :disabled="isLoading"
                 class="form-input-suffix"
               >
-                <EyeOff v-if="showPassword" class="w-4 h-4 text-gray-400" />
-                <Eye v-else class="w-4 h-4 text-gray-400" />
+                <Icon v-if="showPassword" name="EyeOff" size="16" class="text-gray-400" />
+                <Icon v-else name="Eye" size="16" class="text-gray-400" />
               </button>
             </div>
             <transition name="error-fade">
@@ -276,7 +276,7 @@ if (resetToken.value) {
             </label>
             <div class="form-input-wrapper">
               <div class="form-input-icon">
-                <Lock class="w-5 h-5 text-gray-400" />
+                <Icon name="Lock" size="20" class="text-gray-400" />
               </div>
               <input
                 id="confirmPassword"
@@ -298,8 +298,8 @@ if (resetToken.value) {
                 :disabled="isLoading"
                 class="form-input-suffix"
               >
-                <EyeOff v-if="showConfirmPassword" class="w-4 h-4 text-gray-400" />
-                <Eye v-else class="w-4 h-4 text-gray-400" />
+                <Icon v-if="showConfirmPassword" name="EyeOff" size="16" class="text-gray-400" />
+                <Icon v-else name="Eye" size="16" class="text-gray-400" />
               </button>
             </div>
             <transition name="error-fade">
@@ -337,7 +337,7 @@ if (resetToken.value) {
           </span>
           <span v-else class="form-submit-button__content">
             {{ isResetMode ? '重置密码' : '发送重置链接' }}
-            <ArrowRight class="w-4 h-4 ml-2" />
+            <Icon name="ArrowRight" size="16" class="ml-2" />
           </span>
         </button>
       </form>
@@ -357,7 +357,7 @@ if (resetToken.value) {
         <div
           class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center"
         >
-          <CheckCircle class="w-8 h-8 text-green-600 dark:text-green-400" />
+          <Icon name="CheckCircle" size="32" class="text-green-600 dark:text-green-400" />
         </div>
         <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
           {{ isResetMode ? '密码重置成功' : '邮件发送成功' }}

@@ -7,7 +7,7 @@ import { useLocalStorageBoolean, useLocalStorageString } from '@/composables/use
 import { useLocale } from '@/composables/useI18n'
 import { useSeo } from '@/composables/useSeo'
 import { z } from 'zod'
-import { LogIn, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-vue-next'
+import { Icon } from '@/components/ui'
 import { AuthLayout, EnhancedOAuthButtons } from '@/components/auth'
 
 defineOptions({
@@ -34,47 +34,39 @@ const loginSchema = z.object({
 })
 
 // 使用增强表单验证
-const {
-  fields,
-  isSubmitting,
-  serverError,
-  handleSubmit,
-  parentRef,
-  isValid,
-  clearAllErrors,
-  focusField,
-} = useEnhancedFormValidation({
-  schema: loginSchema,
-  initialValues: {
-    email: rememberMe.value ? savedEmail.value : '',
-    password: '',
-  },
-  onSubmit: async (values) => {
-    const result = await authStore.signIn(values.email, values.password)
+const { fields, isSubmitting, serverError, handleSubmit, parentRef, isValid, clearAllErrors } =
+  useEnhancedFormValidation({
+    schema: loginSchema,
+    initialValues: {
+      email: rememberMe.value ? savedEmail.value : '',
+      password: '',
+    },
+    onSubmit: async (values) => {
+      const result = await authStore.signIn(values.email, values.password)
 
-    if (result.success) {
-      // 如果选择记住我，保存邮箱
-      if (rememberMe.value) {
-        savedEmail.value = values.email
+      if (result.success) {
+        // 如果选择记住我，保存邮箱
+        if (rememberMe.value) {
+          savedEmail.value = values.email
+        } else {
+          savedEmail.value = ''
+        }
+
+        // 登录成功，重定向到目标页面
+        const redirectPath = (route.query.redirect as string) || '/'
+        router.push(redirectPath)
       } else {
-        savedEmail.value = ''
+        // 登录失败，抛出错误让 composable 处理
+        throw new Error(result.error || '登录失败，请重试')
       }
-
-      // 登录成功，重定向到目标页面
-      const redirectPath = (route.query.redirect as string) || '/'
-      router.push(redirectPath)
-    } else {
-      // 登录失败，抛出错误让 composable 处理
-      throw new Error(result.error || '登录失败，请重试')
-    }
-  },
-  onSuccess: () => {
-    // 登录成功后的额外处理
-    isFormVisible.value = false
-  },
-  showSuccessMessage: false, // 禁用默认成功消息，因为我们有自己的处理逻辑
-  showErrorMessage: false, // 禁用默认错误消息，因为我们有自己的错误显示
-})
+    },
+    onSuccess: () => {
+      // 登录成功后的额外处理
+      isFormVisible.value = false
+    },
+    showSuccessMessage: false, // 禁用默认成功消息，因为我们有自己的处理逻辑
+    showErrorMessage: false, // 禁用默认错误消息，因为我们有自己的错误显示
+  })
 
 // 计算属性
 const isLoading = computed(() => isSubmitting.value || authStore.loading)
@@ -127,9 +119,11 @@ setTimeout(() => {
   <AuthLayout
     :title="t('auth.welcomeBack')"
     :subtitle="t('auth.loginSubtitle')"
-    :logo-icon="LogIn"
     :footer-text="t('auth.termsNotice')"
   >
+    <template #logo-icon>
+      <Icon name="LogIn" size="32" />
+    </template>
     <div ref="parentRef" class="space-y-6">
       <!-- 页面标题 -->
       <div class="text-center">
@@ -203,7 +197,7 @@ setTimeout(() => {
           </label>
           <div class="form-input-wrapper">
             <div class="form-input-icon">
-              <Mail class="w-5 h-5 text-gray-400" />
+              <Icon name="Mail" size="20" class="text-gray-400" />
             </div>
             <input
               id="email"
@@ -243,7 +237,7 @@ setTimeout(() => {
           </label>
           <div class="form-input-wrapper">
             <div class="form-input-icon">
-              <Lock class="w-5 h-5 text-gray-400" />
+              <Icon name="Lock" size="20" class="text-gray-400" />
             </div>
             <input
               id="password"
@@ -264,8 +258,8 @@ setTimeout(() => {
               :disabled="isLoading"
               class="form-input-suffix"
             >
-              <EyeOff v-if="showPassword" class="w-4 h-4 text-gray-400" />
-              <Eye v-else class="w-4 h-4 text-gray-400" />
+              <Icon v-if="showPassword" name="EyeOff" size="16" class="text-gray-400" />
+              <Icon v-else name="Eye" size="16" class="text-gray-400" />
             </button>
           </div>
           <transition name="error-fade">
@@ -314,7 +308,7 @@ setTimeout(() => {
             </span>
             <span v-else class="form-submit-button__content">
               {{ t('auth.login') }}
-              <ArrowRight class="w-4 h-4 ml-2" />
+              <Icon name="ArrowRight" size="16" class="ml-2" />
             </span>
           </button>
         </div>

@@ -3,8 +3,8 @@ import { computed, ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useLocale } from '@/composables/useI18n'
 import { useTheme } from '@/composables/useTheme'
 import { useNotification } from '@/composables/useNotification'
-import { Moon, Sun, Languages, Shield } from 'lucide-vue-next'
-import { NButton, NIcon } from 'naive-ui'
+import { Icon } from '@/components/ui'
+import { NButton } from 'naive-ui'
 
 interface Props {
   title: string
@@ -106,10 +106,7 @@ onUnmounted(() => {
           class="backdrop-blur-md bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50"
         >
           <template #icon>
-            <n-icon>
-              <Sun v-if="isDark" />
-              <Moon v-else />
-            </n-icon>
+            <Icon :name="isDark ? 'Sun' : 'Moon'" size="16" />
           </template>
         </n-button>
 
@@ -122,9 +119,7 @@ onUnmounted(() => {
             class="backdrop-blur-md bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50"
           >
             <template #icon>
-              <n-icon>
-                <Languages />
-              </n-icon>
+              <Icon name="Languages" size="16" />
             </template>
           </n-button>
 
@@ -159,9 +154,9 @@ onUnmounted(() => {
         <!-- Logo 和标题区域 -->
         <div v-if="showLogo" class="p-8 pb-0">
           <div :class="logoClasses">
-            <n-icon size="32">
-              <component :is="logoIcon || Shield" />
-            </n-icon>
+            <slot name="logo-icon">
+              <Icon name="Shield" size="32" />
+            </slot>
           </div>
 
           <div class="text-center">

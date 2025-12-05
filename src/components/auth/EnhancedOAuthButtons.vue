@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useNotification } from '@/composables/useNotification'
 import { useAutoAnimate } from '@/composables/useAutoAnimate'
 import type { OAuthProvider } from '@/types/database.types'
-import { Chrome, Github, Facebook, Twitter, Loader2 } from 'lucide-vue-next'
+import { Icon } from '@/components/ui'
 
 interface Props {
   redirectPath?: string
@@ -32,7 +32,7 @@ const oauthProviders = [
   {
     provider: 'google' as OAuthProvider,
     name: 'Google',
-    icon: Chrome,
+    iconName: 'Chrome' as const,
     color: '#4285F4',
     bgColor: '#fff',
     textColor: '#000',
@@ -42,7 +42,7 @@ const oauthProviders = [
   {
     provider: 'github' as OAuthProvider,
     name: 'GitHub',
-    icon: Github,
+    iconName: 'Github' as const,
     color: '#24292e',
     bgColor: '#fff',
     textColor: '#000',
@@ -52,7 +52,7 @@ const oauthProviders = [
   {
     provider: 'facebook' as OAuthProvider,
     name: 'Facebook',
-    icon: Facebook,
+    iconName: 'Facebook' as const,
     color: '#1877F2',
     bgColor: '#fff',
     textColor: '#000',
@@ -62,7 +62,7 @@ const oauthProviders = [
   {
     provider: 'twitter' as OAuthProvider,
     name: 'Twitter',
-    icon: Twitter,
+    iconName: 'Twitter' as const,
     color: '#1DA1F2',
     bgColor: '#fff',
     textColor: '#000',
@@ -133,8 +133,8 @@ const getIconSize = () => {
         @click="handleOAuthLogin(provider.provider)"
         :title="provider.description"
       >
-        <component
-          :is="loadingProvider === provider.provider ? Loader2 : provider.icon"
+        <Icon
+          :name="loadingProvider === provider.provider ? 'Loader2' : provider.iconName"
           :size="getIconSize()"
           :class="{
             'animate-spin': loadingProvider === provider.provider,
@@ -153,8 +153,8 @@ const getIconSize = () => {
         @click="handleOAuthLogin(provider.provider)"
         :title="provider.description"
       >
-        <component
-          :is="loadingProvider === provider.provider ? Loader2 : provider.icon"
+        <Icon
+          :name="loadingProvider === provider.provider ? 'Loader2' : provider.iconName"
           :size="getIconSize()"
           :class="{
             'animate-spin': loadingProvider === provider.provider,

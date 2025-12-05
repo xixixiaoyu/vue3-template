@@ -28,12 +28,6 @@ importers:
       '@vee-validate/zod':
         specifier: ^4.15.1
         version: 4.15.1(vue@3.5.25(typescript@5.4.5))(zod@3.25.76)
-      '@vicons/ionicons5':
-        specifier: ^0.13.0
-        version: 0.13.0
-      '@vue/devtools':
-        specifier: ^8.0.5
-        version: 8.0.5(vite@4.5.14(@types/node@20.19.25)(stylus@0.57.0)(terser@5.44.1))(vue@3.5.25(typescript@5.4.5))
       axios:
         specifier: ^1.13.2
         version: 1.13.2
@@ -101,6 +95,9 @@ importers:
       '@vitest/ui':
         specifier: ^4.0.14
         version: 4.0.14(vitest@4.0.14)
+      '@vue/devtools':
+        specifier: ^8.0.5
+        version: 8.0.5(vite@4.5.14(@types/node@20.19.25)(stylus@0.57.0)(terser@5.44.1))(vue@3.5.25(typescript@5.4.5))
       '@vue/eslint-config-prettier':
         specifier: ^8.0.0
         version: 8.0.0(eslint@8.57.1)(prettier@3.7.3)
@@ -2373,12 +2370,6 @@ packages:
       }
     peerDependencies:
       zod: ^3.24.0
-
-  '@vicons/ionicons5@0.13.0':
-    resolution:
-      {
-        integrity: sha512-zvZKBPjEXKN7AXNo2Na2uy+nvuv6SP4KAMQxpKL2vfHMj0fSvuw7JZcOPCjQC3e7ayssKnaoFVAhbYcW6v41qQ==,
-      }
 
   '@vitejs/plugin-vue@4.6.2':
     resolution:
@@ -8662,8 +8653,6 @@ snapshots:
       zod: 3.25.76
     transitivePeerDependencies:
       - vue
-
-  '@vicons/ionicons5@0.13.0': {}
 
   '@vitejs/plugin-vue@4.6.2(vite@4.5.14(@types/node@20.19.25)(stylus@0.57.0)(terser@5.44.1))(vue@3.5.25(typescript@5.4.5))':
     dependencies:

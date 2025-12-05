@@ -46,7 +46,6 @@
     "@tanstack/vue-virtual": "^3.13.12",
     "@unhead/vue": "^2.0.19",
     "@vee-validate/zod": "^4.15.1",
-    "@vicons/ionicons5": "^0.13.0",
     "axios": "^1.13.2",
     "date-fns": "^4.1.0",
     "echarts": "^6.0.0",

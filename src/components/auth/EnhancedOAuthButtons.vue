@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useNotification } from '@/composables/useNotification'
 import { useAutoAnimate } from '@/composables/useAutoAnimate'
+import { useLocale } from '@/composables/useI18n'
 import type { OAuthProvider } from '@/types/database.types'
 import { Icon } from '@/components/ui'
 
@@ -23,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const authStore = useAuthStore()
 const { error, info } = useNotification()
+const { t } = useLocale()
 const [parentRef] = useAutoAnimate()
 
 const loadingProvider = ref<OAuthProvider | null>(null)
@@ -167,7 +169,7 @@ const getIconSize = () => {
     <!-- 分割线 -->
     <div v-if="showDivider" class="oauth-divider">
       <div class="oauth-divider__line"></div>
-      <span class="oauth-divider__text">或使用邮箱</span>
+      <span class="oauth-divider__text">{{ t('oauth.orUseEmail') }}</span>
       <div class="oauth-divider__line"></div>
     </div>
   </div>

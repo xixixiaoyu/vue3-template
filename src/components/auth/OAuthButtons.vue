@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useLocale } from '@/composables/useI18n'
 import type { OAuthProvider } from '@/types/database.types'
 import { NButton, NGrid, NGridItem, NDivider } from 'naive-ui'
 
@@ -16,6 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const authStore = useAuthStore()
+const { t } = useLocale()
 
 // OAuth 提供商配置
 const oauthProviders = [
@@ -89,7 +91,7 @@ const handleOAuthLogin = async (provider: OAuthProvider) => {
     </n-grid>
 
     <!-- 分割线 -->
-    <n-divider v-if="showDivider"> 或使用邮箱 </n-divider>
+    <n-divider v-if="showDivider">{{ t('oauth.orUseEmail') }}</n-divider>
   </div>
 </template>
 

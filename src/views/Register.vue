@@ -186,11 +186,7 @@ setTimeout(() => {
 </script>
 
 <template>
-  <AuthLayout
-    :title="t('auth.register')"
-    :subtitle="t('auth.registerSubtitle')"
-    :footer-text="t('auth.termsNotice')"
-  >
+  <AuthLayout :title="t('auth.register')" :footer-text="t('auth.termsNotice')">
     <template #logo-icon>
       <Icon name="UserPlus" size="32" />
     </template>
@@ -220,7 +216,9 @@ setTimeout(() => {
             <Icon name="AlertCircle" size="20" class="text-red-400" />
           </div>
           <div class="flex-1">
-            <h3 class="text-sm font-medium text-red-800 dark:text-red-200">注册失败</h3>
+            <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
+              {{ t('auth.registrationFailed') || '注册失败' }}
+            </h3>
             <p class="mt-1 text-sm text-red-700 dark:text-red-300">
               {{ errorMessage }}
             </p>
@@ -372,7 +370,9 @@ setTimeout(() => {
           >
             <div class="flex items-start gap-2 mb-2">
               <Icon name="Info" size="16" class="text-blue-500 mt-0.5" />
-              <span class="text-sm font-medium text-blue-800 dark:text-blue-200"> 密码要求 </span>
+              <span class="text-sm font-medium text-blue-800 dark:text-blue-200">{{
+                t('auth.passwordRequirements') || '密码要求'
+              }}</span>
             </div>
             <div class="space-y-1">
               <div
@@ -530,7 +530,9 @@ setTimeout(() => {
         </p>
         <div class="flex items-center justify-center">
           <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-          <span class="ml-3 text-sm text-gray-500 dark:text-gray-400"> 正在跳转到登录页面... </span>
+          <span class="ml-3 text-sm text-gray-500 dark:text-gray-400">{{
+            t('auth.redirectingToLogin') || '正在跳转到登录页面...'
+          }}</span>
         </div>
       </div>
     </div>

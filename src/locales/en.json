@@ -97,14 +97,12 @@
     "accountExists": "Account already exists",
     "accountNotFound": "Account not found",
     "sessionExpired": "Session expired, please login again",
-    "loginSubtitle": "Sign in to your account to continue",
     "noAccount": "Don't have an account?",
     "emailPlaceholder": "your{'@'}email.com",
     "passwordPlaceholder": "••••••••",
     "confirmPasswordPlaceholder": "Please enter your password again",
     "loggingIn": "Signing in...",
     "termsNotice": "By signing in, you agree to our Terms of Service and Privacy Policy",
-    "registerSubtitle": "Register to start using our services",
     "hasAccount": "Already have an account?",
     "name": "Name",
     "namePlaceholder": "Enter your name",
@@ -128,7 +126,11 @@
     "emailSentSuccess": "Email Sent Successfully",
     "passwordResetSuccessMessage": "Your password has been successfully reset, redirecting to login page...",
     "resetLinkSentMessage": "Reset link has been sent to your email, please check your inbox and follow the instructions...",
-    "redirectingToLogin": "Redirecting to login page..."
+    "redirectingToLogin": "Redirecting to login page...",
+    "createAccount": "Create Account",
+    "registerDescription": "Create a new account to start using our services",
+    "registrationFailed": "Registration Failed",
+    "passwordRequirements": "Password Requirements"
   },
   "navigation": {
     "dashboard": "Dashboard",

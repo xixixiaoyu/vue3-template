@@ -97,14 +97,12 @@
     "accountExists": "账户已存在",
     "accountNotFound": "账户不存在",
     "sessionExpired": "会话已过期，请重新登录",
-    "loginSubtitle": "登录您的账户以继续使用",
     "noAccount": "还没有账户？",
     "emailPlaceholder": "your{'@'}email.com",
     "passwordPlaceholder": "••••••••",
     "confirmPasswordPlaceholder": "请再次输入密码",
     "loggingIn": "登录中...",
     "termsNotice": "登录即表示您同意我们的服务条款和隐私政策",
-    "registerSubtitle": "注册以开始使用我们的服务",
     "hasAccount": "已有账户？",
     "name": "姓名",
     "namePlaceholder": "请输入您的姓名",
@@ -128,7 +126,11 @@
     "emailSentSuccess": "邮件发送成功",
     "passwordResetSuccessMessage": "您的密码已成功重置，即将跳转到登录页面...",
     "resetLinkSentMessage": "重置链接已发送到您的邮箱，请查收邮件并按照提示操作...",
-    "redirectingToLogin": "正在跳转到登录页面..."
+    "redirectingToLogin": "正在跳转到登录页面...",
+    "createAccount": "创建账户",
+    "registerDescription": "创建新账户以开始使用我们的服务",
+    "registrationFailed": "注册失败",
+    "passwordRequirements": "密码要求"
   },
   "navigation": {
     "dashboard": "仪表板",

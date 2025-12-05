@@ -129,21 +129,22 @@ if (resetToken.value) {
 
 <template>
   <AuthLayout
-    :title="isResetMode ? '重置密码' : '忘记密码'"
-    :subtitle="isResetMode ? '请输入您的新密码' : '请输入您的邮箱地址，我们将发送重置链接给您'"
+    :title="isResetMode ? t('auth.resetPassword') : t('auth.forgotPassword')"
+    :subtitle="
+      isResetMode
+        ? t('auth.resetPasswordSubtitle') || '请输入您的新密码'
+        : t('auth.forgotPasswordSubtitle') || '请输入您的邮箱地址，我们将发送重置链接给您'
+    "
     :footer-text="t('auth.termsNotice')"
   >
     <template #logo-icon>
       <Icon name="Lock" size="32" />
     </template>
     <div ref="parentRef" class="space-y-6">
-      <!-- 页面标题 -->
+      <!-- 页面切换提示 -->
       <div class="text-center">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          {{ isResetMode ? '重置密码' : '忘记密码' }}
-        </h2>
         <p class="text-gray-600 dark:text-gray-400">
-          记起密码了？
+          {{ t('auth.rememberPassword') || '记起密码了？' }}
           <button
             @click="router.push({ name: 'login' })"
             class="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
@@ -169,7 +170,11 @@ if (resetToken.value) {
           </div>
           <div class="flex-1">
             <h3 class="text-sm font-medium text-red-800 dark:text-red-200">
-              {{ isResetMode ? '重置失败' : '发送失败' }}
+              {{
+                isResetMode
+                  ? t('auth.resetFailed') || '重置失败'
+                  : t('auth.sendFailed') || '发送失败'
+              }}
             </h3>
             <p class="mt-1 text-sm text-red-700 dark:text-red-300">
               {{ errorMessage }}
@@ -333,10 +338,12 @@ if (resetToken.value) {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            {{ isResetMode ? '重置中...' : '发送中...' }}
+            {{
+              isResetMode ? t('auth.resetting') || '重置中...' : t('auth.sending') || '发送中...'
+            }}
           </span>
           <span v-else class="form-submit-button__content">
-            {{ isResetMode ? '重置密码' : '发送重置链接' }}
+            {{ isResetMode ? t('auth.resetPassword') : t('auth.sendResetLink') || '发送重置链接' }}
             <Icon name="ArrowRight" size="16" class="ml-2" />
           </span>
         </button>
@@ -360,18 +367,25 @@ if (resetToken.value) {
           <Icon name="CheckCircle" size="32" class="text-green-600 dark:text-green-400" />
         </div>
         <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
-          {{ isResetMode ? '密码重置成功' : '邮件发送成功' }}
+          {{
+            isResetMode
+              ? t('auth.passwordResetSuccess') || '密码重置成功'
+              : t('auth.emailSentSuccess') || '邮件发送成功'
+          }}
         </h3>
         <p class="text-gray-600 dark:text-gray-400 mb-6">
           {{
             isResetMode
-              ? '您的密码已成功重置，即将跳转到登录页面...'
-              : '重置链接已发送到您的邮箱，请查收邮件并按照提示操作...'
+              ? t('auth.passwordResetSuccessMessage') || '您的密码已成功重置，即将跳转到登录页面...'
+              : t('auth.resetLinkSentMessage') ||
+                '重置链接已发送到您的邮箱，请查收邮件并按照提示操作...'
           }}
         </p>
         <div class="flex items-center justify-center">
           <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-          <span class="ml-3 text-sm text-gray-500 dark:text-gray-400"> 正在跳转到登录页面... </span>
+          <span class="ml-3 text-sm text-gray-500 dark:text-gray-400">
+            {{ t('auth.redirectingToLogin') || '正在跳转到登录页面...' }}
+          </span>
         </div>
       </div>
     </div>

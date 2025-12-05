@@ -85,11 +85,8 @@
     "username": "Username",
     "rememberMe": "Remember Me",
     "loginSuccess": "Login Successful",
-    "loginFailed": "Login Failed",
     "registerSuccess": "Registration Successful",
-    "registerFailed": "Registration Failed",
     "logoutSuccess": "Logout Successful",
-    "logoutFailed": "Logout Failed",
     "confirmLogout": "Are you sure you want to logout?",
     "invalidCredentials": "Invalid username or password",
     "emailRequired": "Email is required",
@@ -100,7 +97,6 @@
     "accountExists": "Account already exists",
     "accountNotFound": "Account not found",
     "sessionExpired": "Session expired, please login again",
-    "welcomeBack": "Welcome Back",
     "loginSubtitle": "Sign in to your account to continue",
     "noAccount": "Don't have an account?",
     "emailPlaceholder": "your{'@'}email.com",
@@ -108,7 +104,6 @@
     "confirmPasswordPlaceholder": "Please enter your password again",
     "loggingIn": "Signing in...",
     "termsNotice": "By signing in, you agree to our Terms of Service and Privacy Policy",
-    "createAccount": "Create New Account",
     "registerSubtitle": "Register to start using our services",
     "hasAccount": "Already have an account?",
     "name": "Name",
@@ -118,11 +113,22 @@
     "and": "and",
     "privacyPolicy": "Privacy Policy",
     "registering": "Registering...",
-    "registerTermsNotice": "By registering, you agree to our Terms of Service and Privacy Policy",
     "registrationSuccessful": "Registration Successful",
-    "registrationSuccessMessage": "Your account has been created successfully, redirecting to dashboard...",
-    "loginDescription": "Sign in to your account to access our services",
-    "registerDescription": "Create a new account to start using our services"
+    "registrationSuccessMessage": "Your account has been created successfully, redirecting to login page...",
+    "newPassword": "New Password",
+    "forgotPasswordSubtitle": "Enter your email address and we will send you a reset link",
+    "resetPasswordSubtitle": "Please enter your new password",
+    "rememberPassword": "Remember your password?",
+    "resetFailed": "Reset Failed",
+    "sendFailed": "Send Failed",
+    "resetting": "Resetting...",
+    "sending": "Sending...",
+    "sendResetLink": "Send Reset Link",
+    "passwordResetSuccess": "Password Reset Successful",
+    "emailSentSuccess": "Email Sent Successfully",
+    "passwordResetSuccessMessage": "Your password has been successfully reset, redirecting to login page...",
+    "resetLinkSentMessage": "Reset link has been sent to your email, please check your inbox and follow the instructions...",
+    "redirectingToLogin": "Redirecting to login page..."
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -230,8 +236,7 @@
     "passwordConfirm": "Please confirm password",
     "nameMinLength": "Name must be at least 2 characters",
     "nameMaxLength": "Name cannot exceed 50 characters",
-    "agreeToTermsRequired": "Please agree to Terms of Service and Privacy Policy",
-    "passwordMismatch": "Passwords do not match"
+    "agreeToTermsRequired": "Please agree to Terms of Service and Privacy Policy"
   },
   "passwordStrength": {
     "weak": "Weak",
@@ -288,7 +293,11 @@
     "minLength": "Must be at least {length} characters",
     "maxLength": "Cannot exceed {length} characters",
     "rangeMin": "Value cannot be less than {min}",
-    "rangeMax": "Value cannot be greater than {max}"
+    "rangeMax": "Value cannot be greater than {max}",
+    "passwordUppercase": "Contains uppercase letter",
+    "passwordLowercase": "Contains lowercase letter",
+    "passwordNumber": "Contains number",
+    "passwordSpecial": "Contains special character"
   },
   "realtime": {
     "connectionError": "Connection error",

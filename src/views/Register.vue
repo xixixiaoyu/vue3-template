@@ -187,19 +187,16 @@ setTimeout(() => {
 
 <template>
   <AuthLayout
-    :title="t('auth.createAccount')"
+    :title="t('auth.register')"
     :subtitle="t('auth.registerSubtitle')"
-    :footer-text="t('auth.registerTermsNotice')"
+    :footer-text="t('auth.termsNotice')"
   >
     <template #logo-icon>
       <Icon name="UserPlus" size="32" />
     </template>
     <div ref="parentRef" class="space-y-6">
-      <!-- 页面标题 -->
+      <!-- 页面切换提示 -->
       <div class="text-center">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          {{ t('auth.register') }}
-        </h2>
         <p class="text-gray-600 dark:text-gray-400">
           {{ t('auth.hasAccount') }}
           <button

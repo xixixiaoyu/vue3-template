@@ -58,7 +58,14 @@ export const useAuthStore = defineStore(
           password,
         })
 
-        if (signInError) throw signInError
+        if (signInError) {
+          // 处理特定的 Supabase 错误
+          let errorMessage = signInError.message
+          if (signInError.message === 'Invalid login credentials') {
+            errorMessage = '邮箱或密码错误'
+          }
+          throw new Error(errorMessage)
+        }
 
         session.value = data.session
         user.value = data.user
@@ -85,7 +92,16 @@ export const useAuthStore = defineStore(
           password,
         })
 
-        if (signUpError) throw signUpError
+        if (signUpError) {
+          // 处理特定的 Supabase 错误
+          let errorMessage = signUpError.message
+          if (signUpError.message.includes('already registered')) {
+            errorMessage = '该邮箱已被注册'
+          } else if (signUpError.message.includes('weak password')) {
+            errorMessage = '密码强度不够，请使用更复杂的密码'
+          }
+          throw new Error(errorMessage)
+        }
 
         session.value = data.session
         user.value = data.user
@@ -138,7 +154,14 @@ export const useAuthStore = defineStore(
           redirectTo: `${window.location.origin}/reset-password`,
         })
 
-        if (resetError) throw resetError
+        if (resetError) {
+          // 处理特定的 Supabase 错误
+          let errorMessage = resetError.message
+          if (resetError.message.includes('User not found')) {
+            errorMessage = '该邮箱未注册'
+          }
+          throw new Error(errorMessage)
+        }
 
         return { success: true }
       } catch (err) {

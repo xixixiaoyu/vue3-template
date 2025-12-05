@@ -35,63 +35,15 @@ const showConfirmPassword = ref(false)
 const isFormVisible = ref(false)
 const showSuccessDialog = ref(false)
 
-// 密码强度计算函数（从 useEnhancedFormValidation 中获取）
-const calculateStrength = (password: string): { score: number; text: string; color: string } => {
-  let score = 0
-
-  // 长度检查
-  if (password.length >= 8) score++
-  if (password.length >= 12) score++
-
-  // 字符类型检查
-  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++
-  if (/\d/.test(password)) score++
-  if (/[^a-zA-Z0-9]/.test(password)) score++
-
-  // 常见密码检查
-  const commonPasswords = ['password', '123456', 'qwerty', 'admin', 'letmein']
-  if (commonPasswords.some((common) => password.toLowerCase().includes(common))) {
-    score = Math.max(0, score - 2)
-  }
-
-  // 重复字符检查
-  const repeatedChars = password.match(/(.)\1{2,}/g)
-  if (repeatedChars) {
-    score = Math.max(0, score - 1)
-  }
-
-  let text = ''
-  let color = ''
-
-  switch (score) {
-    case 0:
-    case 1:
-      text = '弱'
-      color = '#ef4444'
-      break
-    case 2:
-    case 3:
-      text = '中等'
-      color = '#f59e0b'
-      break
-    case 4:
-    case 5:
-      text = '强'
-      color = '#10b981'
-      break
-    default:
-      text = '未知'
-      color = '#6b7280'
-  }
-
-  return { score, text, color }
-}
+// 使用 usePasswordStrength 组合式函数
+import { usePasswordStrength } from '@/composables/useEnhancedFormValidation'
+const { calculateStrength } = usePasswordStrength()
 
 // 定义表单验证 schema
 const registerSchema = z
   .object({
     name: z.string().min(2, t('validation.nameMinLength')).max(50, t('validation.nameMaxLength')),
-    email: z.string().email(t('validation.emailInvalid')),
+    email: z.string().min(1, t('auth.emailRequired')).email(t('validation.emailInvalid')),
     password: z.string().min(6, t('validation.passwordMinLength')),
     confirmPassword: z.string().min(1, t('validation.passwordConfirm')),
     agreeToTerms: z.boolean().refine((val) => val === true, t('validation.agreeToTermsRequired')),
@@ -139,6 +91,8 @@ const { fields, isSubmitting, serverError, handleSubmit, parentRef, isValid, cle
       // 注册成功后的额外处理
       isFormVisible.value = false
     },
+    showSuccessMessage: false, // 禁用默认成功消息，因为我们有自己的成功对话框
+    showErrorMessage: false, // 禁用默认错误消息，因为我们有自己的错误显示
   })
 
 // 计算属性
@@ -160,19 +114,19 @@ const passwordRequirements = computed(() => {
       met: password.length >= 6,
     },
     {
-      text: '包含大写字母',
+      text: t('validation.passwordUppercase') || '包含大写字母',
       met: /[A-Z]/.test(password),
     },
     {
-      text: '包含小写字母',
+      text: t('validation.passwordLowercase') || '包含小写字母',
       met: /[a-z]/.test(password),
     },
     {
-      text: '包含数字',
+      text: t('validation.passwordNumber') || '包含数字',
       met: /\d/.test(password),
     },
     {
-      text: '包含特殊字符',
+      text: t('validation.passwordSpecial') || '包含特殊字符',
       met: /[^a-zA-Z0-9]/.test(password),
     },
   ]

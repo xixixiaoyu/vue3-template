@@ -13,6 +13,8 @@ interface UseEnhancedFormValidationOptions<T extends z.ZodObject<any>> {
   onError?: (error: Error) => void
   validateOnChange?: boolean
   validateOnBlur?: boolean
+  showSuccessMessage?: boolean
+  showErrorMessage?: boolean
 }
 
 export function useEnhancedFormValidation<T extends z.ZodObject<any>>(
@@ -96,8 +98,10 @@ export function useEnhancedFormValidation<T extends z.ZodObject<any>>(
         options.onSuccess()
       }
 
-      // 显示成功消息
-      success('操作成功', '表单提交成功')
+      // 只有在选项中明确指定时才显示成功消息
+      if (options.showSuccessMessage !== false) {
+        success('操作成功', '表单提交成功')
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '提交失败，请重试'
       serverError.value = errorMessage
@@ -107,8 +111,10 @@ export function useEnhancedFormValidation<T extends z.ZodObject<any>>(
         options.onError(err instanceof Error ? err : new Error(errorMessage))
       }
 
-      // 显示错误消息
-      error('表单提交失败', errorMessage)
+      // 只有在选项中明确指定时才显示错误消息
+      if (options.showErrorMessage !== false) {
+        error('表单提交失败', errorMessage)
+      }
 
       // 滚动到错误位置
       await nextTick()

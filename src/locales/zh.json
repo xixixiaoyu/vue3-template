@@ -122,7 +122,8 @@
     "registrationSuccessful": "注册成功",
     "registrationSuccessMessage": "您的账户已创建成功，即将跳转到仪表板...",
     "loginDescription": "登录您的账户以访问我们的服务",
-    "registerDescription": "创建新账户以开始使用我们的服务"
+    "registerDescription": "创建新账户以开始使用我们的服务",
+    "newPassword": "新密码"
   },
   "navigation": {
     "dashboard": "仪表板",
@@ -292,7 +293,11 @@
     "nameMinLength": "姓名至少需要 2 个字符",
     "nameMaxLength": "姓名不能超过 50 个字符",
     "agreeToTermsRequired": "请同意服务条款和隐私政策",
-    "passwordMismatch": "两次输入的密码不一致"
+    "passwordMismatch": "两次输入的密码不一致",
+    "passwordUppercase": "包含大写字母",
+    "passwordLowercase": "包含小写字母",
+    "passwordNumber": "包含数字",
+    "passwordSpecial": "包含特殊字符"
   },
   "realtime": {
     "connectionError": "连接错误",

@@ -31,7 +31,7 @@ const email = computed(() => route.query.email as string)
 
 // 定义表单验证 schema
 const requestSchema = z.object({
-  email: z.string().email(t('validation.emailInvalid')),
+  email: z.string().min(1, t('auth.emailRequired')).email(t('validation.emailInvalid')),
 })
 
 const resetSchema = z
@@ -81,6 +81,8 @@ const { fields, isSubmitting, serverError, handleSubmit, parentRef, isValid, cle
     onSuccess: () => {
       isFormVisible.value = false
     },
+    showSuccessMessage: false, // 禁用默认成功消息，因为我们有自己的成功对话框
+    showErrorMessage: false, // 禁用默认错误消息，因为我们有自己的错误显示
   })
 
 // 计算属性

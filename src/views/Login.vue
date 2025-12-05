@@ -29,7 +29,7 @@ const isFormVisible = ref(false)
 
 // 定义表单验证 schema
 const loginSchema = z.object({
-  email: z.string().email(t('validation.emailInvalid')).min(1, t('auth.emailRequired')),
+  email: z.string().min(1, t('auth.emailRequired')).email(t('validation.emailInvalid')),
   password: z.string().min(6, t('validation.passwordMinLength')),
 })
 
@@ -72,6 +72,8 @@ const {
     // 登录成功后的额外处理
     isFormVisible.value = false
   },
+  showSuccessMessage: false, // 禁用默认成功消息，因为我们有自己的处理逻辑
+  showErrorMessage: false, // 禁用默认错误消息，因为我们有自己的错误显示
 })
 
 // 计算属性

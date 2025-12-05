@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useLocale } from '@/composables/useI18n'
 import { useTheme } from '@/composables/useTheme'
 import { useNotification } from '@/composables/useNotification'
@@ -27,6 +27,7 @@ const { isDark, toggleTheme } = useTheme()
 const { success } = useNotification()
 
 const showLanguageSwitcher = ref(false)
+const languageSwitcherRef = ref<HTMLElement | null>(null)
 
 const containerClasses = computed(() => [
   'min-h-screen flex items-center justify-center p-4 transition-all duration-300',
@@ -58,9 +59,26 @@ const handleLanguageChange = (newLocale: string) => {
   success('语言已切换', `已切换到 ${newLocale === 'zh' ? '中文' : 'English'}`)
 }
 
+// 点击外部关闭语言切换器
+const handleClickOutside = (event: MouseEvent) => {
+  if (languageSwitcherRef.value && !languageSwitcherRef.value.contains(event.target as Node)) {
+    showLanguageSwitcher.value = false
+  }
+}
+
 onMounted(() => {
   // 添加页面加载动画
   document.body.classList.add('auth-page-loaded')
+
+  // 添加点击外部事件监听器
+  nextTick(() => {
+    document.addEventListener('click', handleClickOutside)
+  })
+})
+
+onUnmounted(() => {
+  // 移除事件监听器
+  document.removeEventListener('click', handleClickOutside)
 })
 </script>
 
@@ -96,10 +114,10 @@ onMounted(() => {
         </n-button>
 
         <!-- 语言切换按钮 -->
-        <div class="relative">
+        <div ref="languageSwitcherRef" class="relative">
           <n-button
             circle
-            @click="showLanguageSwitcher = !showLanguageSwitcher"
+            @click.stop="showLanguageSwitcher = !showLanguageSwitcher"
             size="small"
             class="backdrop-blur-md bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50"
           >

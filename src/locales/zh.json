@@ -288,7 +288,11 @@
     "minLength": "至少需要 {length} 个字符",
     "maxLength": "不能超过 {length} 个字符",
     "rangeMin": "数值不能小于 {min}",
-    "rangeMax": "数值不能大于 {max}"
+    "rangeMax": "数值不能大于 {max}",
+    "nameMinLength": "姓名至少需要 2 个字符",
+    "nameMaxLength": "姓名不能超过 50 个字符",
+    "agreeToTermsRequired": "请同意服务条款和隐私政策",
+    "passwordMismatch": "两次输入的密码不一致"
   },
   "realtime": {
     "connectionError": "连接错误",

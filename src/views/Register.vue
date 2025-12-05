@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useEnhancedFormValidation, usePasswordStrength } from '@/composables'
+import { useEnhancedFormValidation } from '@/composables'
 import { useLocale } from '@/composables/useI18n'
 import { useSeo } from '@/composables/useSeo'
 import { z } from 'zod'
@@ -35,27 +35,76 @@ const showConfirmPassword = ref(false)
 const isFormVisible = ref(false)
 const showSuccessDialog = ref(false)
 
-// 密码强度计算
-const { calculateStrength } = usePasswordStrength()
+// 密码强度计算函数（从 useEnhancedFormValidation 中获取）
+const calculateStrength = (password: string): { score: number; text: string; color: string } => {
+  let score = 0
+
+  // 长度检查
+  if (password.length >= 8) score++
+  if (password.length >= 12) score++
+
+  // 字符类型检查
+  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++
+  if (/\d/.test(password)) score++
+  if (/[^a-zA-Z0-9]/.test(password)) score++
+
+  // 常见密码检查
+  const commonPasswords = ['password', '123456', 'qwerty', 'admin', 'letmein']
+  if (commonPasswords.some((common) => password.toLowerCase().includes(common))) {
+    score = Math.max(0, score - 2)
+  }
+
+  // 重复字符检查
+  const repeatedChars = password.match(/(.)\1{2,}/g)
+  if (repeatedChars) {
+    score = Math.max(0, score - 1)
+  }
+
+  let text = ''
+  let color = ''
+
+  switch (score) {
+    case 0:
+    case 1:
+      text = '弱'
+      color = '#ef4444'
+      break
+    case 2:
+    case 3:
+      text = '中等'
+      color = '#f59e0b'
+      break
+    case 4:
+    case 5:
+      text = '强'
+      color = '#10b981'
+      break
+    default:
+      text = '未知'
+      color = '#6b7280'
+  }
+
+  return { score, text, color }
+}
 
 // 定义表单验证 schema
 const registerSchema = z
   .object({
-    name: z.string().min(2, '姓名至少需要 2 个字符').max(50, '姓名不能超过 50 个字符'),
-    email: z.string().email('请输入有效的邮箱地址'),
-    password: z.string().min(6, '密码至少需要 6 个字符'),
-    confirmPassword: z.string().min(1, '请确认密码'),
-    agreeToTerms: z.boolean().refine((val) => val === true, '请同意服务条款和隐私政策'),
+    name: z.string().min(2, t('validation.nameMinLength')).max(50, t('validation.nameMaxLength')),
+    email: z.string().email(t('validation.emailInvalid')),
+    password: z.string().min(6, t('validation.passwordMinLength')),
+    confirmPassword: z.string().min(1, t('validation.passwordConfirm')),
+    agreeToTerms: z.boolean().refine((val) => val === true, t('validation.agreeToTermsRequired')),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: '两次输入的密码不一致',
+    message: t('validation.passwordMismatch'),
     path: ['confirmPassword'],
   })
 
 // 使用增强表单验证
 const { fields, isSubmitting, serverError, handleSubmit, parentRef, isValid, clearAllErrors } =
   useEnhancedFormValidation({
-    schema: registerSchema,
+    schema: registerSchema as any,
     initialValues: {
       name: '',
       email: '',
@@ -107,7 +156,7 @@ const passwordRequirements = computed(() => {
   const password = fields.password?.value || ''
   return [
     {
-      text: '至少 6 个字符',
+      text: t('validation.passwordMinLength'),
       met: password.length >= 6,
     },
     {

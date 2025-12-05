@@ -2,11 +2,8 @@
 import { computed, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import {
-  useEnhancedFormValidation,
-  useLocalStorageBoolean,
-  useLocalStorageString,
-} from '@/composables'
+import { useEnhancedFormValidation } from '@/composables'
+import { useLocalStorageBoolean, useLocalStorageString } from '@/composables/useLocalStorage'
 import { useLocale } from '@/composables/useI18n'
 import { useSeo } from '@/composables/useSeo'
 import { z } from 'zod'
@@ -32,8 +29,8 @@ const isFormVisible = ref(false)
 
 // 定义表单验证 schema
 const loginSchema = z.object({
-  email: z.string().email('请输入有效的邮箱地址').min(1, '请输入邮箱'),
-  password: z.string().min(6, '密码至少需要 6 个字符'),
+  email: z.string().email(t('validation.emailInvalid')).min(1, t('auth.emailRequired')),
+  password: z.string().min(6, t('validation.passwordMinLength')),
 })
 
 // 使用增强表单验证
@@ -93,25 +90,11 @@ const togglePasswordVisibility = () => {
 }
 
 // 忘记密码
-const handleForgotPassword = async () => {
-  if (!fields.email.value) {
-    focusField('email')
-    fields.email.validate()
-    return
-  }
-
-  try {
-    const result = await authStore.resetPassword(fields.email.value)
-    if (result.success) {
-      // 显示成功消息
-      console.log('密码重置邮件已发送')
-    } else {
-      // 显示错误消息
-      console.error('密码重置失败:', result.error)
-    }
-  } catch (error) {
-    console.error('密码重置失败:', error)
-  }
+const handleForgotPassword = () => {
+  router.push({
+    name: 'reset-password',
+    query: fields.email.value ? { email: fields.email.value } : {},
+  })
 }
 
 // 快捷键处理

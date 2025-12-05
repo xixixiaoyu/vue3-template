@@ -116,7 +116,7 @@ setTimeout(() => {
 </script>
 
 <template>
-  <AuthLayout :title="t('auth.login')" :footer-text="t('auth.termsNotice')">
+  <AuthLayout :title="t('auth.login')">
     <template #logo-icon>
       <Icon name="LogIn" size="32" />
     </template>

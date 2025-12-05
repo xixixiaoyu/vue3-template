@@ -135,7 +135,6 @@ if (resetToken.value) {
         ? t('auth.resetPasswordSubtitle') || '请输入您的新密码'
         : t('auth.forgotPasswordSubtitle') || '请输入您的邮箱地址，我们将发送重置链接给您'
     "
-    :footer-text="t('auth.termsNotice')"
   >
     <template #logo-icon>
       <Icon name="Lock" size="32" />

@@ -150,7 +150,7 @@ setTimeout(() => {
 </script>
 
 <template>
-  <AuthLayout :title="t('auth.register')" :footer-text="t('auth.termsNotice')">
+  <AuthLayout :title="t('auth.register')">
     <template #logo-icon>
       <Icon name="UserPlus" size="32" />
     </template>

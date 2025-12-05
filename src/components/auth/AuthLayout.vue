@@ -174,13 +174,6 @@ onUnmounted(() => {
           <slot />
         </div>
       </div>
-
-      <!-- 底部信息 -->
-      <div v-if="showFooter" class="text-center mt-6 px-2">
-        <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
-          {{ footerText || t('auth.termsNotice') }}
-        </p>
-      </div>
     </div>
   </div>
 </template>

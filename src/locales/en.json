@@ -128,6 +128,7 @@
     "redirectingToLogin": "Redirecting to login page...",
     "createAccount": "Create Account",
     "registerDescription": "Create a new account to start using our services",
+    "loginDescription": "Login to your account to access our services",
     "registrationFailed": "Registration Failed"
   },
   "navigation": {

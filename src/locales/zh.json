@@ -128,6 +128,7 @@
     "redirectingToLogin": "正在跳转到登录页面...",
     "createAccount": "创建账户",
     "registerDescription": "创建新账户以开始使用我们的服务",
+    "loginDescription": "登录您的账户以访问我们的服务",
     "registrationFailed": "注册失败"
   },
   "navigation": {

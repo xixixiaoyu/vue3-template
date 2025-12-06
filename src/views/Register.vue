@@ -30,7 +30,6 @@ const registerSchema = z
     email: z.string().min(1, t('auth.emailRequired')).email(t('validationRules.emailInvalid')),
     password: z.string().min(6, t('validationRules.passwordMinLength')),
     confirmPassword: z.string().min(1, t('validation.passwordConfirm')),
-    agreeToTerms: z.boolean().refine((val) => val === true, t('validation.agreeToTermsRequired')),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: t('auth.passwordMismatch'),
@@ -46,7 +45,6 @@ const { fields, isSubmitting, serverError, handleSubmit, parentRef, isValid, cle
       email: '',
       password: '',
       confirmPassword: '',
-      agreeToTerms: false,
     },
     onSubmit: async (values) => {
       const result = await authStore.signUp(values.email, values.password)
@@ -349,40 +347,6 @@ setTimeout(() => {
           <transition name="error-fade">
             <p v-if="fields.confirmPassword?.errorMessage" class="form-error">
               {{ fields.confirmPassword?.errorMessage }}
-            </p>
-          </transition>
-        </div>
-
-        <!-- 服务条款 -->
-        <div class="form-group">
-          <label class="flex items-start gap-3 cursor-pointer">
-            <input
-              :checked="fields.agreeToTerms?.value"
-              @change="handleCheckboxChange('agreeToTerms', $event)"
-              @blur="fields.agreeToTerms?.validate"
-              type="checkbox"
-              class="form-checkbox mt-1"
-            />
-            <span class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-              {{ t('auth.agreeToTerms') }}
-              <button
-                type="button"
-                class="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
-              >
-                {{ t('auth.termsOfService') }}
-              </button>
-              {{ t('auth.and') }}
-              <button
-                type="button"
-                class="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"
-              >
-                {{ t('auth.privacyPolicy') }}
-              </button>
-            </span>
-          </label>
-          <transition name="error-fade">
-            <p v-if="fields.agreeToTerms?.errorMessage" class="form-error">
-              {{ fields.agreeToTerms?.errorMessage }}
             </p>
           </transition>
         </div>

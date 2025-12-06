@@ -105,10 +105,7 @@
     "hasAccount": "已有账户？",
     "name": "姓名",
     "namePlaceholder": "请输入您的姓名",
-    "agreeToTerms": "我同意",
-    "termsOfService": "服务条款",
     "and": "和",
-    "privacyPolicy": "隐私政策",
     "registering": "注册中...",
     "registrationSuccessful": "注册成功",
     "registrationSuccessMessage": "您的账户已创建成功，即将跳转到登录页面...",
@@ -236,8 +233,7 @@
   "validation": {
     "passwordConfirm": "请确认密码",
     "nameMinLength": "姓名至少需要 2 个字符",
-    "nameMaxLength": "姓名不能超过 50 个字符",
-    "agreeToTermsRequired": "请同意服务条款和隐私政策"
+    "nameMaxLength": "姓名不能超过 50 个字符"
   },
   "fileUpload": {
     "unsupportedType": "不支持的文件类型。支持的类型：",

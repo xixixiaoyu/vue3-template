@@ -105,10 +105,7 @@
     "hasAccount": "Already have an account?",
     "name": "Name",
     "namePlaceholder": "Enter your name",
-    "agreeToTerms": "I agree to",
-    "termsOfService": "Terms of Service",
     "and": "and",
-    "privacyPolicy": "Privacy Policy",
     "registering": "Registering...",
     "registrationSuccessful": "Registration Successful",
     "registrationSuccessMessage": "Your account has been created successfully, redirecting to login page...",
@@ -236,8 +233,7 @@
   "validation": {
     "passwordConfirm": "Please confirm password",
     "nameMinLength": "Name must be at least 2 characters",
-    "nameMaxLength": "Name cannot exceed 50 characters",
-    "agreeToTermsRequired": "Please agree to Terms of Service and Privacy Policy"
+    "nameMaxLength": "Name cannot exceed 50 characters"
   },
   "fileUpload": {
     "unsupportedType": "Unsupported file type. Supported types: ",

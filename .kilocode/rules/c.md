@@ -30,6 +30,7 @@
 - **@tanstack/vue-virtual** - 虚拟滚动组件
 - **vuedraggable** - 拖拽功能
 - **vue-upload-component** - 文件上传组件
+- **vfonts** - 字体支持
 
 ### 数据处理与工具
 
@@ -63,6 +64,15 @@ src/
 ├── assets/           # 静态资源
 ├── components/       # 可复用组件
 │   ├── ui/          # 基础 UI 组件（Naive UI）
+│   │   ├── dev-alert/
+│   │   ├── draggable-list/
+│   │   ├── icon/
+│   │   ├── language-switcher/
+│   │   ├── lazy-image/
+│   │   ├── loading/
+│   │   ├── notification/
+│   │   ├── pwa-install/
+│   │   └── virtual-list/
 │   └── auth/        # 认证相关组件
 ├── composables/      # 组合式函数（Vue 3 Composition API）
 ├── constants/        # 常量定义
@@ -73,13 +83,18 @@ src/
 │   ├── lodash.ts    # 工具函数库
 │   ├── vue-query.ts # Vue Query 封装
 │   ├── sentry.ts    # Sentry 错误监控配置
+│   ├── icons.ts     # 图标配置
+│   ├── index.ts     # 库入口文件
 │   └── utils.ts     # 通用工具函数
 ├── locales/         # 国际化文件
 ├── middleware/      # 路由中间件
 ├── router/          # 路由配置和守卫
 ├── stores/          # Pinia 状态管理
 ├── test/            # 测试配置和工具
+│   └── components/  # 测试组件
 ├── types/           # TypeScript 类型定义
+│   ├── database.types.ts # Supabase 数据库类型
+│   └── index.ts     # 通用类型定义
 ├── utils/           # 工具函数
 └── views/           # 页面组件
 ```
@@ -281,6 +296,9 @@ success('操作成功', '数据已保存')
 
 // 显示错误通知
 error('操作失败', '请检查网络连接')
+
+// 显示持久错误通知
+error('操作失败', '请检查网络连接', { persistent: true })
 ```
 
 ### 表单验证
@@ -311,15 +329,35 @@ const { fields, isSubmitting, handleSubmit } = useFormValidation({
 完整的文件上传功能，支持多种文件类型和验证：
 
 ```typescript
-import { useFileUpload } from '@/composables/useFileUpload'
+import { useFileUpload, FILE_TYPE_LIMITS } from '@/composables/useFileUpload'
 
-const { uploadFile, isUploading, uploadProgress } = useFileUpload()
+const {
+  uploadFile,
+  uploadMultipleFiles,
+  isUploading,
+  uploadProgress,
+  validateFileType,
+  validateFileSize,
+  detectFileType,
+} = useFileUpload()
 
-// 上传文件
+// 上传单个文件
 const result = await uploadFile(file, {
   bucket: 'avatars',
   category: 'image',
 })
+
+// 上传多个文件
+const results = await uploadMultipleFiles(files, {
+  bucket: 'documents',
+  category: 'document',
+})
+
+// 验证文件类型
+validateFileType(file, 'image')
+
+// 自动检测文件类型
+const fileType = detectFileType(file)
 ```
 
 ### Supabase 数据库操作
@@ -340,6 +378,190 @@ const subscription = supabase
     console.log('Change received!', payload)
   })
   .subscribe()
+```
+
+### Vue Query 数据管理
+
+基于 TanStack Query 的数据获取和状态管理：
+
+```typescript
+import {
+  useSupabaseQuery,
+  useSupabaseList,
+  useSupabaseCreate,
+  useSupabaseUpdate,
+  useSupabaseDelete,
+  useSupabasePaginatedQuery,
+} from '@/lib/vue-query'
+
+// 查询单个记录
+const { data: user, isLoading, error } = useSupabaseQuery('users', userId)
+
+// 查询列表
+const {
+  data: users,
+  isLoading,
+  error,
+} = useSupabaseList('users', {
+  filters: { active: true },
+  orderBy: 'created_at',
+  ascending: false,
+  pageSize: 20,
+})
+
+// 分页查询
+const {
+  data: paginatedUsers,
+  isLoading,
+  error,
+  page,
+  nextPage,
+  prevPage,
+  goToPage,
+} = useSupabasePaginatedQuery('users', {
+  pageSize: 10,
+  orderBy: 'created_at',
+})
+
+// 创建记录
+const createMutation = useSupabaseCreate('users')
+const handleCreate = async (userData) => {
+  await createMutation.mutateAsync(userData)
+}
+
+// 更新记录
+const updateMutation = useSupabaseUpdate('users')
+const handleUpdate = async (id, updates) => {
+  await updateMutation.mutateAsync({ id, updates })
+}
+
+// 删除记录
+const deleteMutation = useSupabaseDelete('users')
+const handleDelete = async (id) => {
+  await deleteMutation.mutateAsync(id)
+}
+```
+
+### 错误监控 (Sentry)
+
+全局错误监控和性能分析：
+
+```typescript
+import { reportError, reportMessage, setUser, setTag } from '@/lib/sentry'
+
+// 手动报告错误
+try {
+  // 可能出错的代码
+} catch (error) {
+  reportError(error, {
+    context: 'user_action',
+    userId: '123',
+    action: 'submit_form',
+  })
+}
+
+// 报告消息
+reportMessage('User completed onboarding', 'info')
+
+// 设置用户信息
+setUser({
+  id: '123',
+  email: 'user@example.com',
+  username: 'john_doe',
+})
+
+// 设置标签
+setTag('feature', 'premium')
+setTag('version', '1.0.0')
+```
+
+### 主题管理
+
+支持明暗主题切换：
+
+```typescript
+import { useTheme } from '@/composables/useTheme'
+
+const { theme, isDark, toggleTheme, setTheme } = useTheme()
+
+// 切换主题
+toggleTheme()
+
+// 设置特定主题
+setTheme('dark')
+
+// 检查当前主题
+if (isDark.value) {
+  console.log('当前是暗色主题')
+}
+```
+
+### 国际化支持
+
+多语言切换功能：
+
+```typescript
+import { useI18n } from '@/composables/useI18n'
+
+const { locale, t, setLocale, availableLocales } = useI18n()
+
+// 切换语言
+setLocale('en')
+
+// 获取翻译文本
+const message = t('welcome.message')
+
+// 获取可用语言列表
+console.log(availableLocales.value)
+```
+
+### 权限管理
+
+基于角色的权限控制：
+
+```typescript
+import { usePermissions } from '@/composables/usePermissions'
+
+const { hasPermission, hasRole, can } = usePermissions()
+
+// 检查权限
+if (hasPermission('users:create')) {
+  // 显示创建用户按钮
+}
+
+// 检查角色
+if (hasRole('admin')) {
+  // 显示管理员功能
+}
+
+// 使用权限检查函数
+if (can('edit', 'post')) {
+  // 显示编辑按钮
+}
+```
+
+### 实时数据同步
+
+Supabase 实时订阅封装：
+
+```typescript
+import { useRealtime } from '@/composables/useRealtime'
+
+const { subscribe, unsubscribe, isConnected } = useRealtime()
+
+// 订阅表变更
+const unsubscribeFn = subscribe('posts', (payload) => {
+  console.log('Posts table changed:', payload)
+  // 处理数据变更
+})
+
+// 取消订阅
+unsubscribeFn()
+
+// 检查连接状态
+if (isConnected.value) {
+  console.log('实时连接已建立')
+}
 ```
 
 ## 环境配置
@@ -374,36 +596,36 @@ pnpm build
 pnpm preview
 
 # 运行测试
-pnpm test
-pnpm test:ui
-pnpm test:run
-pnpm test:coverage
+pnpm test              # 运行单元测试
+pnpm test:ui           # 运行测试 UI 界面
+pnpm test:run          # 运行测试并退出
+pnpm test:coverage     # 生成测试覆盖率报告
 
 # E2E 测试
-pnpm test:e2e
-pnpm test:e2e:ui
-pnpm test:e2e:debug
-pnpm test:e2e:codegen
-pnpm test:e2e:install
+pnpm test:e2e          # 运行 E2E 测试
+pnpm test:e2e:ui       # 运行 E2E 测试 UI 界面
+pnpm test:e2e:debug    # 调试模式运行 E2E 测试
+pnpm test:e2e:codegen  # 生成 E2E 测试代码
+pnpm test:e2e:install  # 安装 E2E 测试依赖
 
 # 代码检查和格式化
-pnpm lint
-pnpm format
-pnpm format:check
-pnpm type-check
+pnpm lint              # 运行 ESLint 检查
+pnpm format            # 格式化代码
+pnpm format:check       # 检查代码格式
+pnpm type-check        # TypeScript 类型检查
 
 # 数据库操作
-pnpm db:init
-pnpm db:migrate
-pnpm db:reset
-pnpm db:types
+pnpm db:init           # 初始化数据库
+pnpm db:migrate        # 运行数据库迁移
+pnpm db:reset          # 重置数据库
+pnpm db:types          # 生成数据库类型定义
 
 # Supabase 操作
-pnpm supabase:start
-pnpm supabase:stop
+pnpm supabase:start    # 启动 Supabase 本地服务
+pnpm supabase:stop     # 停止 Supabase 本地服务
 
 # 构建分析
-pnpm build:analyze
+pnpm build:analyze     # 构建并分析包大小
 ```
 
 ## 最佳实践
@@ -423,6 +645,9 @@ pnpm build:analyze
 - CSRF 保护
 - 敏感信息不在前端存储
 - 使用 HTTPS
+- Supabase RLS（行级安全）策略
+- JWT 令牌管理
+- 环境变量保护
 
 ### 可访问性
 

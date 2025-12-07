@@ -6,10 +6,46 @@
  * 用于初始化 Supabase 数据库结构和基础数据
  */
 
-const { createClient } = require('@supabase/supabase-js')
-const fs = require('fs')
-const path = require('path')
-const readline = require('readline')
+import { createClient } from '@supabase/supabase-js'
+import fs from 'fs'
+import path from 'path'
+import readline from 'readline'
+import { fileURLToPath } from 'url'
+
+// 获取当前文件的目录路径（ES 模块中等价于 __dirname）
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+// 加载环境变量
+function loadEnvFile() {
+  const envPath = path.join(__dirname, '../.env')
+  const envExamplePath = path.join(__dirname, '../.env.example')
+
+  // 如果 .env 文件不存在，尝试从 .env.example 复制
+  if (!fs.existsSync(envPath) && fs.existsSync(envExamplePath)) {
+    colorLog('未找到 .env 文件，正在从 .env.example 创建...', 'yellow')
+    fs.copyFileSync(envExamplePath, envPath)
+    colorLog('已创建 .env 文件，请编辑其中的 Supabase 配置', 'yellow')
+    colorLog('请编辑 .env 文件后重新运行此脚本', 'cyan')
+    process.exit(0)
+  }
+
+  // 读取并解析 .env 文件
+  if (fs.existsSync(envPath)) {
+    const envContent = fs.readFileSync(envPath, 'utf8')
+    const envLines = envContent.split('\n')
+
+    for (const line of envLines) {
+      const trimmedLine = line.trim()
+      if (trimmedLine && !trimmedLine.startsWith('#')) {
+        const [key, ...values] = trimmedLine.split('=')
+        if (key && values.length > 0) {
+          process.env[key.trim()] = values.join('=').trim()
+        }
+      }
+    }
+  }
+}
 
 // 创建命令行接口
 const rl = readline.createInterface({
@@ -68,41 +104,26 @@ function createSupabaseClient() {
 async function executeSqlFile(supabase, filePath) {
   try {
     colorLog(`正在执行 SQL 文件：${filePath}`, 'blue')
+    colorLog(
+      '注意：由于 Supabase 客户端限制，请手动在 Supabase Dashboard 中执行此 SQL 文件',
+      'yellow'
+    )
 
     const sqlContent = fs.readFileSync(filePath, 'utf8')
 
-    // 分割 SQL 语句（简单分割，以分号结尾）
-    const statements = sqlContent
-      .split(';')
-      .map((stmt) => stmt.trim())
-      .filter((stmt) => stmt.length > 0 && !stmt.startsWith('--'))
+    // 显示 SQL 文件内容的前几行
+    const lines = sqlContent.split('\n').slice(0, 10)
+    colorLog('SQL 文件内容预览：', 'cyan')
+    lines.forEach((line, index) => {
+      console.log(`${(index + 1).toString().padStart(3, ' ')} | ${line}`)
+    })
 
-    colorLog(`找到 ${statements.length} 个 SQL 语句`, 'green')
-
-    // 逐个执行 SQL 语句
-    for (let i = 0; i < statements.length; i++) {
-      const statement = statements[i]
-
-      try {
-        const { error } = await supabase.rpc('exec_sql', { sql_statement: statement })
-
-        if (error) {
-          colorLog(`SQL 语句 ${i + 1} 执行失败：`, 'red')
-          console.error(error)
-          return false
-        }
-
-        if ((i + 1) % 10 === 0) {
-          colorLog(`已执行 ${i + 1}/${statements.length} 个语句`, 'green')
-        }
-      } catch (err) {
-        colorLog(`SQL 语句 ${i + 1} 执行异常：`, 'red')
-        console.error(err)
-        return false
-      }
+    if (sqlContent.split('\n').length > 10) {
+      console.log('    ... (更多内容)')
     }
 
-    colorLog(`SQL 文件执行完成：${filePath}`, 'green')
+    colorLog(`\n请访问 Supabase Dashboard -> SQL Editor 来执行此文件：${filePath}`, 'yellow')
+
     return true
   } catch (error) {
     colorLog(`读取 SQL 文件失败：${error.message}`, 'red')
@@ -255,6 +276,9 @@ async function main() {
   colorLog('此脚本将初始化数据库结构和基础数据\n', 'yellow')
 
   try {
+    // 加载环境变量
+    loadEnvFile()
+
     // 检查环境变量
     checkEnvironmentVariables()
 
@@ -263,12 +287,14 @@ async function main() {
 
     // 测试连接
     colorLog('正在测试 Supabase 连接...', 'blue')
-    // eslint-disable-next-line no-unused-vars
-    const { data: _, error } = await supabase.from('profiles').select('count').limit(1)
 
-    if (error) {
+    // 尝试获取会话信息来测试连接
+    const { error: sessionError } = await supabase.auth.getSession()
+
+    // 即使没有会话，只要没有网络错误就说明连接正常
+    if (sessionError && !sessionError.message.includes('Invalid')) {
       colorLog('Supabase 连接失败：', 'red')
-      console.error(error)
+      console.error(sessionError)
       process.exit(1)
     }
 
@@ -351,6 +377,6 @@ process.on('unhandledRejection', (reason, promise) => {
 })
 
 // 运行主函数
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main()
 }

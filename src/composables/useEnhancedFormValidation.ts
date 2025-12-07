@@ -85,12 +85,25 @@ export function useEnhancedFormValidation<T extends z.ZodObject<any>>(
     }
   })
 
-  const handleSubmit = form.handleSubmit(async (values: z.infer<T>) => {
+  // 自定义提交处理函数，先手动验证再执行回调
+  const handleSubmit = async () => {
     try {
       isSubmitting.value = true
       serverError.value = ''
       isSubmitted.value = true
 
+      // 先验证所有字段
+      const validationResult = await form.validate()
+
+      if (!validationResult.valid) {
+        // 验证失败，滚动到第一个错误
+        await nextTick()
+        scrollToError()
+        return
+      }
+
+      // 获取表单值并执行提交
+      const values = form.values as z.infer<T>
       await options.onSubmit(values)
 
       // 成功回调
@@ -122,7 +135,7 @@ export function useEnhancedFormValidation<T extends z.ZodObject<any>>(
     } finally {
       isSubmitting.value = false
     }
-  })
+  }
 
   // 滚动到第一个错误字段
   const scrollToError = async () => {
@@ -185,13 +198,24 @@ export function useEnhancedFormValidation<T extends z.ZodObject<any>>(
     return !!getFieldError(fieldName)
   }
 
-  // 检查表单是否有任何错误
+  // 检查表单是否有任何验证错误消息
   const hasErrors = computed(() => {
-    return Object.values(fields).some((field) => field.invalid) || !!serverError.value
+    return Object.values(fields).some((field) => !!field.errorMessage) || !!serverError.value
   })
 
-  // 表单有效性
-  const isValid = computed(() => form.meta.value.valid && !hasErrors.value)
+  // 检查所有字段是否都已填写
+  const allFieldsFilled = computed(() => {
+    return fieldNames.every((fieldName) => {
+      const value = fields[fieldName]?.value
+      if (value === undefined || value === null) return false
+      if (typeof value === 'string') return value.trim().length > 0
+      if (typeof value === 'boolean') return true
+      return !!value
+    })
+  })
+
+  // 表单有效性：所有字段已填写 + 无错误消息
+  const isValid = computed(() => allFieldsFilled.value && !hasErrors.value)
 
   // 表单是否被修改过
   const isDirty = computed(() => form.meta.value.dirty)

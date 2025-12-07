@@ -347,10 +347,18 @@ const subscription = supabase
 ### 必需的环境变量
 
 ```env
+# Supabase 配置
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_API_BASE_URL=your_api_base_url
+
+# API 配置
+VITE_API_BASE_URL=http://localhost:3000/api
+
+# 错误监控配置（可选）
 VITE_SENTRY_DSN=your_sentry_dsn
+
+# 应用基础 URL
+BASE_URL=/
 ```
 
 ### 开发脚本

@@ -22,7 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
   showFooter: true,
 })
 
-const { t, currentLocale, setLocale } = useLocale()
+const { currentLocale, setLocale } = useLocale()
 const { isDark, toggleTheme } = useTheme()
 const { success } = useNotification()
 

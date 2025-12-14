@@ -105,14 +105,6 @@ const handleInput = (fieldName: string, event: Event) => {
   }
 }
 
-// 安全的复选框处理函数
-const handleCheckboxChange = (fieldName: string, event: Event) => {
-  const target = event.target as HTMLInputElement
-  if (fields[fieldName] && target) {
-    fields[fieldName].value = target.checked
-  }
-}
-
 // 快捷键处理
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Enter' && !event.shiftKey) {

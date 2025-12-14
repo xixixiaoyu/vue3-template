@@ -30,3 +30,7 @@ dist-ssr
 
 # TypeScript
 *.tsbuildinfo
+
+# Build analyze output
+stats.html
+stats*.html
